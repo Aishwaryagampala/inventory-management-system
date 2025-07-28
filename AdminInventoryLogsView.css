@@ -1,0 +1,161 @@
+/* src/components/AdminInventoryLogsView.css */
+.admin-inventory-logs-view-container {
+    padding: 30px;
+    background-color: #f8f9fa; /* Light background for the page content */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.inventory-logs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; /* Separator for header */
+}
+
+.inventory-logs-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.header-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-color: #333; /* Dark button as in image */
+    color: white;
+}
+
+.header-button:hover {
+    background-color: #555;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification-icon {
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-icon:hover {
+    color: #007bff;
+}
+
+.search-filter-bar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.search-filter-bar input[type="text"] {
+    flex-grow: 1; /* Take up available space */
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.search-filter-bar input[type="text"]:focus {
+    border-color: #007bff;
+}
+
+.search-filter-bar .filter-dropdown {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.search-filter-bar .filter-dropdown:focus {
+    border-color: #007bff;
+}
+
+.inventory-table-container {
+    overflow-x: auto; /* Enable horizontal scrolling for small screens */
+    border: 1px solid #e0e0e0; /* Subtle border for the table container */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); /* Light shadow for table */
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse; /* Collapse table borders */
+    min-width: 700px; /* Ensure table doesn't get too narrow */
+}
+
+.inventory-table th,
+.inventory-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #eee; /* Light border between rows */
+}
+
+.inventory-table th {
+    background-color: #f0f0f0; /* Header background */
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.inventory-table tbody tr:hover {
+    background-color: #f5f5f5; /* Hover effect on rows */
+}
+
+.inventory-table td {
+    color: #333;
+    font-size: 15px;
+}
+
+/* Status specific styling */
+.status-in-stock {
+    color: #28a745; /* Green */
+    font-weight: 500;
+}
+
+.status-low-stock {
+    color: #ffc107; /* Orange */
+    font-weight: 500;
+}
+
+.status-critical {
+    color: #dc3545; /* Red */
+    font-weight: 500;
+}
+
+/* Optional: Microphone icon styling */
+.search-filter-bar .microphone-icon {
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.search-filter-bar .microphone-icon:hover {
+    background-color: #eee;
+}

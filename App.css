@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  /* Removed @import url for Inter font to fix compilation error */
+  font-family: 'Inter', sans-serif; /* Using Inter font as per previous context */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5; /* Light grey background for the whole page */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 1200px; /* Max width for the entire login page */
+  margin: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden; /* Ensures rounded corners apply to children */
+}
