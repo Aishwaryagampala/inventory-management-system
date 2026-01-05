@@ -6,13 +6,14 @@ const logController = require("./logControllers");
 const { sendLowStockAlert } = require("../utils/mailer");
 
 const addProduct = async (req, res) => {
-  const { sku, name, category, quantity, reorder_level, expiry } = req.body;
+  const { sku, name, brand, category, quantity, reorder_level, expiry } =
+    req.body;
   const barcode = `INV-${sku}`;
   try {
     const user_id = req.user.id;
     await pool.query(
-      "INSERT INTO products (sku, name, barcode, category, quantity, reorder_level, expiry) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-      [sku, name, barcode, category, quantity, reorder_level, expiry]
+      "INSERT INTO products (sku, name, brand, barcode, category, quantity, reorder_level, expiry) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+      [sku, name, brand, barcode, category, quantity, reorder_level, expiry]
     );
     const barcodeUrl = await barCode.generateBarcodeImage(sku, barcode);
     await logController.createLog(sku, null, quantity, user_id);
@@ -33,6 +34,7 @@ const getAllProducts = async (req, res) => {
         SELECT
             sku,
             name,
+            brand,
             category,
             quantity,
             reorder_level,
@@ -81,16 +83,17 @@ const updateProduct = async (req, res) => {
     let query;
     if (action === "sale") {
       query =
-        "UPDATE products SET name = $1, category = $2, quantity = quantity - $3, reorder_level = $4, expiry = $5 WHERE sku = $6 RETURNING *";
+        "UPDATE products SET name = $1, brand = $2, category = $3, quantity = quantity - $4, reorder_level = $5, expiry = $6 WHERE sku = $7 RETURNING *";
     } else if (action === "return" || action === "restock") {
       query =
-        "UPDATE products SET name = $1, category = $2, quantity = quantity + $3, reorder_level = $4, expiry = $5 WHERE sku = $6 RETURNING *";
+        "UPDATE products SET name = $1, brand = $2, category = $3, quantity = quantity + $4, reorder_level = $5, expiry = $6 WHERE sku = $7 RETURNING *";
     } else {
       return res.status(400).json({ message: "Invalid action type" });
     }
 
     const result = await pool.query(query, [
       name,
+      brand,
       category,
       amount,
       reorder_level,
@@ -168,7 +171,7 @@ const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    await logController.createLog(sku, "Deleted", null, user_id);
+    await logController.createLog(sku, "deleted", null, user_id);
     res.status(200).json({ message: "Product deleted" });
   } catch (err) {
     console.error(err);

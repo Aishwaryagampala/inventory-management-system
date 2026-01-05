@@ -1,23 +1,22 @@
-const pool = require('../db/db')
+const pool = require("../db/db");
 const getCategoryDistribution = async (req, res) => {
-    try{
-        const result = await pool.query(
-            `SELECT category, COUNT(*) AS count
+  try {
+    const result = await pool.query(
+      `SELECT category, COUNT(*) AS count
             FROM products
             GROUP BY category`
-        );
-        res.status(200).json(result.rows)
-    }
-    catch(err){
-        console.error(err)
-        res.status(500).json({message: "Error fetching category distribution"})
-    }
-}
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching category distribution" });
+  }
+};
 
 const getlowQuantity = async (req, res) => {
-    try{
-        const result = await pool.query(
-            `SELECT sku, name, quantity, reorder_level, 
+  try {
+    const result = await pool.query(
+      `SELECT sku, name, quantity, reorder_level, 
                 CASE
                     WHEN quantity <= reorder_level THEN 'Low Stock'
                     WHEN quantity <= reorder_level + 5 THEN 'Borderline'
@@ -25,40 +24,42 @@ const getlowQuantity = async (req, res) => {
                 END AS status
             FROM products
             WHERE quantity <= reorder_level + 5`
-        )
-        res.status(200).json(result.rows)
-    }
-    catch(err){
-        console.error(err)
-        res.status(500).json({message: "Error fetching low/borderline stock items"})
-    }
-}
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Error fetching low/borderline stock items" });
+  }
+};
 
-const getDailyActivityLogs = async(req, res) => {
-    const days = parseInt(req.query.days) || 7
-    try{
-        const result = await pool.query(
-            `SELECT 
+const getDailyActivityLogs = async (req, res) => {
+  const days = Math.max(1, parseInt(req.query.days) || 7);
+  try {
+    // Use a safe, properly formatted interval string
+    const interval = `${days} days`;
+    const result = await pool.query(
+      `SELECT 
                 DATE(created_at) AS day, 
                 COUNT(*) AS total_logs 
             FROM inventory_logs 
-            WHERE created_at >= NOW() - INTERVAL $1
+            WHERE created_at >= NOW() - INTERVAL '${interval}'
             GROUP BY day 
-            ORDER BY day ASC`, [`${days}, days`]
-        )
-        res.status(200).json(result.rows)
-    }
-    catch(err){
-        console.error(err)
-        res.status(500).json({message: "Error fetching daily logs"})
-    }
-}
+            ORDER BY day ASC`
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching daily logs" });
+  }
+};
 
 const getTopSellingProducts = async (req, res) => {
-    try {
-        const limit = parseInt(req.query.limit) || 10;
+  try {
+    const limit = parseInt(req.query.limit) || 10;
 
-        const result = await pool.query(`
+    const result = await pool.query(`
             SELECT 
                     p.sku, 
                     p.name,
@@ -76,18 +77,16 @@ const getTopSellingProducts = async (req, res) => {
                 LIMIT 10;   
             `);
 
-        res.status(200).json(result.rows);
-    } 
-    catch (err) {
-        console.error('Error fetching top selling products:', err);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching top selling products:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
-
 module.exports = {
-    getCategoryDistribution,
-    getlowQuantity,
-    getDailyActivityLogs,
-    getTopSellingProducts
-}
+  getCategoryDistribution,
+  getlowQuantity,
+  getDailyActivityLogs,
+  getTopSellingProducts,
+};
