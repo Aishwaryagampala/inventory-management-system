@@ -2,92 +2,77 @@
 import React, { useState, useMemo } from "react";
 import "./AdminInventoryLogsView.css";
 
-const AdminInventoryLogsView = ({
-  products, // Products passed from InventoryLogsPage (fetched from backend)
-  handleUpdateProductClick,
-  handleRestockClick,
-  isAdmin,
-}) => {
+const AdminInventoryLogsView = ({ logs, onRefresh }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [filterCategory, setFilterCategory] = useState("All");
-  const [categories, setCategories] = useState([]);
+  const [filterAction, setFilterAction] = useState("All");
+  const [logLimit, setLogLimit] = useState(50);
 
-  // Extract unique categories from products
-  React.useEffect(() => {
-    if (products && products.length > 0) {
-      const uniqueCategories = [
-        ...new Set(products.map((p) => p.category).filter(Boolean)),
-      ];
-      setCategories(uniqueCategories);
+  const handleDeleteLog = async (logId) => {
+    if (!window.confirm("Are you sure you want to delete this log entry?")) {
+      return;
     }
-  }, [products]);
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products || [];
+    try {
+      const response = await fetch(`/api/logs/${logId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
-    if (filterCategory !== "All") {
+      if (response.ok) {
+        alert("Log deleted successfully");
+        if (onRefresh) onRefresh();
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete log: ${error.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error deleting log:", error);
+      alert("Network error. Could not delete log.");
+    }
+  };
+
+  const filteredLogs = useMemo(() => {
+    let filtered = logs || [];
+
+    if (filterAction !== "All") {
       filtered = filtered.filter(
-        (product) =>
-          product.category &&
-          product.category.toLowerCase() === filterCategory.toLowerCase()
+        (log) =>
+          log.action && log.action.toLowerCase() === filterAction.toLowerCase()
       );
     }
 
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
-      filtered = filtered.filter((product) => {
+      filtered = filtered.filter((log) => {
         return (
-          (product.sku && product.sku.toLowerCase().includes(q)) ||
-          (product.name && product.name.toLowerCase().includes(q)) ||
-          (product.brand && product.brand.toLowerCase().includes(q)) ||
-          (product.category && product.category.toLowerCase().includes(q))
+          (log.sku && log.sku.toLowerCase().includes(q)) ||
+          (log.action && log.action.toLowerCase().includes(q)) ||
+          (log.user && log.user.toLowerCase().includes(q))
         );
       });
     }
 
-    return filtered;
-  }, [products, searchTerm, filterCategory]);
+    // Apply limit
+    return filtered.slice(0, logLimit);
+  }, [logs, searchTerm, filterAction, logLimit]);
 
-  const getStatusClassName = (status) => {
-    switch (status) {
-      case "In Stock":
-        return "status-in-stock";
-      case "Low Stock":
-        return "status-low-stock";
-      case "Critical":
-        return "status-critical";
-      default:
-        return "";
-    }
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleString();
   };
 
   return (
     <div className="admin-inventory-logs-view-container">
       <div className="inventory-logs-header">
-        <h1>Inventory Logs (Admin View)</h1>
-        <div className="header-actions">
-          {isAdmin && (
-            <>
-              <button
-                className="header-button"
-                onClick={() => handleUpdateProductClick()}
-              >
-                Update Product
-              </button>
-              <button className="header-button" onClick={handleRestockClick}>
-                Restock
-              </button>
-            </>
-          )}
-          <span className="notification-icon">🔔</span>
-        </div>
+        <h1>Inventory Logs</h1>
       </div>
 
       <div className="search-filter-bar">
         <input
           type="text"
-          placeholder="🔍 Search (press Enter)"
+          placeholder="Search (press Enter)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => {
@@ -97,65 +82,125 @@ const AdminInventoryLogsView = ({
             }
           }}
         />
-        <span className="microphone-icon">🎤</span>{" "}
-        {/* Placeholder for speech-to-text */}
         <select
-          className="filter-dropdown"
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
+          value={logLimit}
+          onChange={(e) => setLogLimit(parseInt(e.target.value))}
+          style={{
+            padding: "14px 20px",
+            border: "2px solid #e0e0e0",
+            borderRadius: "12px",
+            fontSize: "15px",
+            background: "#fafafa",
+            cursor: "pointer",
+            outline: "none",
+            fontWeight: "500",
+          }}
         >
-          <option value="All">All Categories</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-          <option value="Books">Books</option>
-          {/* Add more filter options based on your actual backend categories */}
+          <option value={10}>Show 10</option>
+          <option value={25}>Show 25</option>
+          <option value={50}>Show 50</option>
+          <option value={100}>Show 100</option>
+          <option value={500}>Show 500</option>
+          <option value={99999}>Show All</option>
         </select>
+      </div>
+
+      <div className="category-filter-buttons">
+        <button
+          className={`filter-btn ${filterAction === "All" ? "active" : ""}`}
+          onClick={() => setFilterAction("All")}
+        >
+          All
+        </button>
+        <button
+          className={`filter-btn ${filterAction === "sale" ? "active" : ""}`}
+          onClick={() => setFilterAction("sale")}
+        >
+          Sale
+        </button>
+        <button
+          className={`filter-btn ${filterAction === "restock" ? "active" : ""}`}
+          onClick={() => setFilterAction("restock")}
+        >
+          Restock
+        </button>
+        <button
+          className={`filter-btn ${filterAction === "update" ? "active" : ""}`}
+          onClick={() => setFilterAction("update")}
+        >
+          Update
+        </button>
+        <button
+          className={`filter-btn ${filterAction === "added" ? "active" : ""}`}
+          onClick={() => setFilterAction("added")}
+        >
+          Added
+        </button>
       </div>
 
       <div className="inventory-table-container">
         <table className="inventory-table">
           <thead>
             <tr>
-              <th>Products</th>
-              <th>Brand</th>
-              <th>Category</th>
-              <th>Quantity</th>
-              <th>Status</th>
+              <th>ID</th>
+              <th>SKU</th>
+              <th>Action</th>
+              <th>Amount</th>
+              <th>User</th>
+              <th>Date & Time</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <tr key={product.sku}>
-                  <td>{product.name}</td>
-                  <td>{product.brand || "-"}</td>
-                  <td>{product.category}</td>
-                  <td>{product.quantity}</td>
-                  {(() => {
-                    const qty = Number(product.quantity || 0);
-                    const rl = Number(product.reorder_level || 0);
-                    const status =
-                      qty <= rl
-                        ? "Critical"
-                        : qty <= rl + 5
-                        ? "Low Stock"
-                        : "In Stock";
-                    return (
-                      <td className={getStatusClassName(status)}>{status}</td>
-                    );
-                  })()}
+            {filteredLogs.length > 0 ? (
+              filteredLogs.map((log) => (
+                <tr key={log.id}>
+                  <td>{log.id}</td>
+                  <td>{log.sku || "-"}</td>
+                  <td style={{ textTransform: "capitalize" }}>
+                    {log.action || "-"}
+                  </td>
+                  <td>{log.amount || "-"}</td>
+                  <td>{log.user || "-"}</td>
+                  <td>{formatDate(log.created_at)}</td>
+                  <td>
+                    <button
+                      className="delete-log-btn"
+                      onClick={() => handleDeleteLog(log.id)}
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #1a1a1a 0%, #000000 100%)",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 16px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontSize: "13px",
+                        transition: "all 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = "translateY(-2px)";
+                        e.target.style.boxShadow =
+                          "0 4px 12px rgba(0, 0, 0, 0.4)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = "translateY(0)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="7"
                   style={{ textAlign: "center", padding: "20px" }}
                 >
-                  No products found.
+                  No logs found.
                 </td>
               </tr>
             )}

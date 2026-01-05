@@ -25,7 +25,7 @@ CREATE TABLE inventory_logs(
     id SERIAL PRIMARY KEY,
     sku VARCHAR(50) REFERENCES products(sku) ON DELETE CASCADE,
     action TEXT CHECK (
-        action IS NULL OR action IN ('sale', 'return', 'restock', 'deleted')
+        action IS NULL OR action IN ('sale', 'restock', 'update', 'added')
     ),    amount INTEGER,
     user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

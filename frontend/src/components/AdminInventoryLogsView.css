@@ -106,6 +106,40 @@
   background: #ffffff;
 }
 
+.category-filter-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+}
+
+.filter-btn {
+  padding: 10px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  color: #666;
+  letter-spacing: 0.3px;
+}
+
+.filter-btn:hover {
+  border-color: #1a1a1a;
+  color: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+  color: white;
+  border-color: #000000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
 .inventory-table-container {
   overflow-x: auto;
   border: 1px solid #f0f0f0;
