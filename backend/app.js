@@ -31,7 +31,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/export", exportRoutes);
-app.use("/api", logRoutes);
+app.use("/api/logs", logRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

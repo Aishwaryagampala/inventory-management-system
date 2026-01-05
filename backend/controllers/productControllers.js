@@ -16,7 +16,7 @@ const addProduct = async (req, res) => {
       [sku, name, brand, barcode, category, quantity, reorder_level, expiry]
     );
     const barcodeUrl = await barCode.generateBarcodeImage(sku, barcode);
-    await logController.createLog(sku, null, quantity, user_id);
+    await logController.createLog(sku, "added", quantity, user_id);
     res.status(201).json({ message: "Product added successfully", barcodeUrl });
   } catch (err) {
     console.error(err);
@@ -136,8 +136,19 @@ const updateProduct = async (req, res) => {
     }
 
     // Only log if there's an action (sale/restock/return)
-    if (action && action !== "update") {
+    // Also log "update" actions for admin tracking
+    if (
+      action &&
+      (action === "sale" || action === "restock" || action === "return")
+    ) {
+      console.log("Logging action:", action, "amount:", amount);
       await logController.createLog(sku, action, amount, user_id);
+    } else if (action === "update") {
+      // Log update actions with the new quantity value
+      console.log("Logging update action with quantity:", quantity);
+      await logController.createLog(sku, "update", quantity, user_id);
+    } else {
+      console.log("No action to log or action is null/undefined:", action);
     }
 
     res.status(200).json({ message: "Product updated" });
@@ -197,7 +208,6 @@ const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    await logController.createLog(sku, "deleted", null, user_id);
     res.status(200).json({ message: "Product deleted" });
   } catch (err) {
     console.error(err);
