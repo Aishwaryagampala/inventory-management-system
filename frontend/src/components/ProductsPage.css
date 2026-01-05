@@ -1,84 +1,76 @@
 /* src/components/ProductsPage.css */
 
 .products-page-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 20px auto;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+  background: #ffffff;
+  min-height: 100%;
 }
 
 .products-header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
-  gap: 15px; /* Space between items if wrapped */
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .products-title {
-  font-size: 2.2em;
-  color: #2c3e50;
+  font-size: 36px;
+  color: #1a1a1a;
   margin: 0;
-  font-weight: 600;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .products-actions {
   display: flex;
-  gap: 10px; /* Space between buttons */
+  gap: 12px;
   flex-wrap: wrap;
 }
 
-/* Base button styles */
 .action-button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 0.95em;
-  font-weight: 500;
-  transition: background-color 0.3s ease, transform 0.2s ease,
-    box-shadow 0.2s ease;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
   text-align: center;
-  white-space: nowrap; /* Prevent text wrapping */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Default primary button style (e.g., Add Product, Add User) */
-.action-button {
-  background-color: #3498db; /* Blue */
+  white-space: nowrap;
+  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
   color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.3px;
 }
 
 .action-button:hover {
-  background-color: #2980b9;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .action-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Specific style for "Update Product" button (generic) */
 .action-button.update-button {
-  background-color: #2ecc71; /* Green */
+  background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
 }
 
 .action-button.update-button:hover {
-  background-color: #27ae60;
+  background: linear-gradient(135deg, #444 0%, #222 100%);
 }
 
-/* Filter and Search Row */
 .products-filter-row {
   display: flex;
   gap: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -88,116 +80,130 @@
   position: relative;
   display: flex;
   align-items: center;
-  flex-grow: 1; /* Allows them to take available space */
-  max-width: 400px; /* Limit width */
-  min-width: 250px;
+  flex-grow: 1;
+  max-width: 450px;
+  min-width: 280px;
 }
 
 .search-input,
 .filter-dropdown {
   width: 100%;
-  padding: 10px 10px 10px 40px; /* Left padding for icon */
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1em;
-  color: #555;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background-color: white;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 14px 16px 14px 45px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1a1a1a;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  font-weight: 500;
 }
 
 .search-input:focus,
 .filter-dropdown:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
   outline: none;
+  background: #ffffff;
+}
+
+.search-input::placeholder {
+  color: #999;
 }
 
 .search-icon,
 .filter-icon,
 .mic-icon {
   position: absolute;
-  left: 10px;
-  color: #999;
-  pointer-events: none; /* Make icons non-interactive */
+  left: 15px;
+  color: #666;
+  pointer-events: none;
 }
 
 .mic-icon {
   left: auto;
-  right: 10px;
+  right: 15px;
 }
 
 .filter-icon {
   left: auto;
-  right: 10px;
+  right: 15px;
 }
 
-/* Table styles */
 .products-table-container {
-  overflow-x: auto; /* Allows table to scroll horizontally on small screens */
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  background-color: white;
+  overflow-x: auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
 }
 
 .products-table {
   width: 100%;
-  border-collapse: collapse;
-  min-width: 600px; /* Ensure table is not too narrow */
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 700px;
 }
 
 .products-table th,
 .products-table td {
   text-align: left;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f5f5f5;
 }
 
 .products-table th {
-  background-color: #ecf0f1;
-  color: #2c3e50;
-  font-weight: 600;
+  background: linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%);
+  color: #1a1a1a;
+  font-weight: 700;
   text-transform: uppercase;
-  font-size: 0.9em;
+  font-size: 12px;
+  letter-spacing: 1px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .products-table tr:last-child td {
   border-bottom: none;
 }
 
-.products-table tbody tr:hover {
-  background-color: #f5f5f5;
+.products-table tbody tr {
+  transition: all 0.2s ease;
 }
 
-/* Small buttons within the table (Update, Delete, View Barcode) */
+.products-table tbody tr:hover {
+  background: #fafafa;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 .action-button.small-button {
-  padding: 7px 12px;
-  font-size: 0.85em;
-  border-radius: 5px;
-  margin-right: 5px; /* Spacing between small buttons */
-  box-shadow: none; /* Remove extra shadow for small buttons */
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 8px;
+  margin-right: 8px;
+  font-weight: 600;
 }
 
 .action-button.small-button:hover {
-  transform: none; /* No vertical transform for small buttons */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Delete button specific style */
 .action-button.small-button.delete-button {
-  background-color: #e74c3c; /* Red */
+  background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+  border: 1px solid #000;
 }
 
 .action-button.small-button.delete-button:hover {
-  background-color: #c0392b;
+  background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
 }
 
-/* Error message styling */
 .error-message {
-  color: #e74c3c;
-  background-color: #ffe0e0;
-  border: 1px solid #e74c3c;
-  padding: 10px 15px;
+  color: #fff;
+  background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+  border: 2px solid #000;
+  padding: 14px 20px;
   border-radius: 6px;
   margin-bottom: 20px;
   text-align: center;

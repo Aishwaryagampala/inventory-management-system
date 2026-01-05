@@ -5,105 +5,142 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+  background-color: rgba(0, 0, 0, 0.75);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
-  background-color: #fff;
-  padding: 30px; /* Increased padding */
-  border-radius: 12px; /* More rounded corners */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+  background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
-  max-width: 500px; /* Max width for consistency */
+  max-width: 550px;
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Spacing between elements */
+  gap: 24px;
+  animation: slideUp 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-header {
-  font-size: 24px; /* Larger font size */
-  font-weight: 600; /* Bolder text */
-  color: #333;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a1a1a;
   text-align: center;
-  margin-bottom: 20px; /* Space below header */
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
 }
 
 .modal-form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px; /* Spacing between form groups */
+  margin-bottom: 8px;
 }
 
 .modal-form-group label {
-  font-size: 14px; /* Smaller label font */
-  color: #555;
-  margin-bottom: 8px; /* Space below label */
-  font-weight: 500;
+  font-size: 14px;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  font-size: 12px;
 }
 
 .modal-form-group input,
 .modal-form-group select {
-  padding: 12px 15px; /* More padding */
-  border: 1px solid #ccc;
-  border-radius: 8px; /* Rounded input fields */
-  font-size: 16px;
-  color: #333;
+  padding: 14px 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1a1a1a;
   outline: none;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  font-weight: 500;
 }
 
 .modal-form-group input:focus,
 .modal-form-group select:focus {
-  border-color: #007bff; /* Highlight on focus */
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+  background: #ffffff;
 }
 
 .modal-form-row {
   display: flex;
-  gap: 20px; /* Space between items in a row */
+  gap: 20px;
 }
 
 .modal-form-row .modal-form-group {
-  flex: 1; /* Distribute space evenly */
-  margin-bottom: 0; /* Remove bottom margin if part of a row */
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .modal-buttons {
   display: flex;
-  justify-content: center; /* Center buttons */
-  gap: 15px; /* Space between buttons */
-  margin-top: 25px; /* Space above buttons */
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .modal-button {
-  padding: 12px 25px; /* Larger buttons */
+  padding: 14px 32px;
   border: none;
-  border-radius: 8px; /* Rounded buttons */
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 13px;
 }
 
 .modal-button.primary {
-  background-color: #333; /* Dark primary button */
+  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
   color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .modal-button.primary:hover {
-  background-color: #555; /* Slightly lighter on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .modal-button.secondary {
-  background-color: #e0e0e0; /* Light secondary button */
-  color: #333;
+  background: #f0f0f0;
+  color: #1a1a1a;
+  border: 2px solid #e0e0e0;
 }
 
 .modal-button.secondary:hover {
-  background-color: #d0d0d0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: #e0e0e0;
+  border-color: #d0d0d0;
 }
