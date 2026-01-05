@@ -1,7 +1,6 @@
-// src/components/RecentActivityModal.js
 import React, { useState, useEffect, useCallback } from "react";
-import "./Modals/Modals.css"; // Assuming modal styling comes from here
-import "./AdminInventoryLogsView.css"; // For table styling, from image_3178d7.png
+import "./Modal.css";
+import "./AdminInventoryLogsView.css";
 
 const RecentActivityModal = ({ isOpen, onClose }) => {
   const [activities, setActivities] = useState([]);
