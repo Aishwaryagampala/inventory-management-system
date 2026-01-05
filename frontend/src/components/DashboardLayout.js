@@ -30,9 +30,11 @@ const DashboardLayout = ({ userRole, onLogout }) => {
               Inventory Logs
             </Link>
           )}
-          <Link to="/dashboard/barcode-scanner" className="nav-link">
-            Barcode Scanner
-          </Link>
+          {isStaff && (
+            <Link to="/dashboard/barcode-scanner" className="nav-link">
+              Barcode Scanner
+            </Link>
+          )}
           <Link to="/dashboard/reports" className="nav-link">
             Reports
           </Link>

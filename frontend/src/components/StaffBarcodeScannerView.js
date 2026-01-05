@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
+import { toast } from "react-toastify";
 import "./StaffBarcodeScannerView.css";
 import { fetchData } from "../utils/api";
 
@@ -157,6 +158,14 @@ const StaffBarcodeScannerView = ({
           scannedProduct.name
         }.`
       );
+
+      // Check if product is now low on stock
+      if (updatedProduct.quantity <= updatedProduct.reorder_level) {
+        toast.warning(
+          `⚠️ Low Stock Alert: ${updatedProduct.name} is at ${updatedProduct.quantity} units (Reorder level: ${updatedProduct.reorder_level})`,
+          { autoClose: 5000 }
+        );
+      }
 
       setRecentScans((prev) =>
         [

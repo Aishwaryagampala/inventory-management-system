@@ -6,6 +6,8 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import LoginPage from "./LoginPage";
 import DashboardLayout from "./components/DashboardLayout";
 import ProductsPage from "./components/ProductsPage";
@@ -70,6 +72,18 @@ const App = () => {
 
   return (
     <div className="app-container">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Router>
         <Routes>
           <Route
@@ -101,7 +115,16 @@ const App = () => {
               />
               <Route
                 path="barcode-scanner"
-                element={<StaffBarcodeScannerView />}
+                element={
+                  userRole && userRole.toLowerCase() === "staff" ? (
+                    <StaffBarcodeScannerView />
+                  ) : (
+                    <div style={{ padding: "50px", textAlign: "center" }}>
+                      <h2>Access Denied</h2>
+                      <p>Only staff members can access the barcode scanner.</p>
+                    </div>
+                  )
+                }
               />
               <Route
                 path="reports"

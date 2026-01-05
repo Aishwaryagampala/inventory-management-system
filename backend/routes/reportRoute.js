@@ -12,13 +12,13 @@ router.get(
   reportController.getCategoryDistribution
 );
 router.get(
-  "/low-quantity",
+  "/low-stock",
   authMiddleware,
   roleMiddleware(["admin", "staff"]),
   reportController.getlowQuantity
 );
 router.get(
-  "/daily-activity",
+  "/daily-logs",
   authMiddleware,
   roleMiddleware(["admin", "staff"]),
   reportController.getDailyActivityLogs

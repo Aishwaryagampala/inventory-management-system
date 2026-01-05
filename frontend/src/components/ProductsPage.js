@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import "./ProductsPage.css";
 import AddProductModal from "./Modals/AddProductModal";
 import AddUserModal from "./Modals/AddUserModal";
@@ -35,7 +36,7 @@ function ProductsPage({ userRole }) {
       const response = await fetch(endpoint, options);
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
-          alert("Session expired. Please log in again.");
+          toast.error("Session expired. Please log in again.");
           window.location.href = "/";
           return null;
         }
@@ -91,12 +92,26 @@ function ProductsPage({ userRole }) {
 
       // Reload products
       const data = await fetchData("/products");
-      if (data) setProducts(data);
+      if (data) {
+        setProducts(data);
+
+        // Check if the updated product is now low on stock
+        const updatedProduct = data.find((p) => p.sku === selectedProduct.sku);
+        if (
+          updatedProduct &&
+          updatedProduct.quantity <= updatedProduct.reorder_level
+        ) {
+          toast.warning(
+            `⚠️ Low Stock Alert: ${updatedProduct.name} (${updatedProduct.sku}) is at ${updatedProduct.quantity} units (Reorder level: ${updatedProduct.reorder_level})`,
+            { autoClose: 5000 }
+          );
+        }
+      }
 
       setShowUpdateModal(false);
       setSelectedProduct(null);
     } catch (err) {
-      alert(`Failed to update quantity: ${err.message}`);
+      toast.error(`Failed to update quantity: ${err.message}`);
     }
   };
 
@@ -111,10 +126,8 @@ function ProductsPage({ userRole }) {
       // Reload products
       const data = await fetchData("/products");
       if (data) setProducts(data);
-
-      alert("Product deleted successfully");
     } catch (err) {
-      alert(`Failed to delete product: ${err.message}`);
+      toast.error(`Failed to delete product: ${err.message}`);
     }
   };
 
@@ -141,9 +154,8 @@ function ProductsPage({ userRole }) {
 
       setShowEditModal(false);
       setSelectedProduct(null);
-      alert("Product updated successfully");
     } catch (err) {
-      alert(`Failed to update product: ${err.message}`);
+      toast.error(`Failed to update product: ${err.message}`);
     }
   };
 

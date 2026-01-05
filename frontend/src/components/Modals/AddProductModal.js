@@ -1,5 +1,6 @@
 // src/components/Modals/AddProductModal.js
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import "../Modal.css";
 
 const AddProductModal = ({ onClose, onSuccess }) => {

@@ -1,5 +1,6 @@
 // src/components/AdminInventoryLogsView.js
 import React, { useState, useMemo } from "react";
+import { toast } from "react-toastify";
 import "./AdminInventoryLogsView.css";
 
 const AdminInventoryLogsView = ({ logs, onRefresh }) => {

@@ -1,15 +1,44 @@
 const pool = require("../db/db");
+const nodemailer = require("nodemailer");
+
+// Track recent alerts to prevent spam (SKU -> timestamp)
+const recentAlerts = new Map();
+const COOLDOWN_MINUTES = 60; // Don't send same alert within 60 minutes
 
 const sendEmail = async ({ to, subject, html }) => {
-  if (!process.env.MAIL_PROVIDER_KEY) {
+  // Development mode - just log to console
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.log("[MAIL:DEV]", { to, subject });
     console.log(html);
     return;
   }
 
-  console.warn(
-    "sendEmail is configured with MAIL_PROVIDER_KEY, but no provider SDK is wired up yet."
-  );
+  try {
+    // Create transporter with SMTP configuration
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(process.env.SMTP_PORT) || 465,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // Send email
+    const info = await transporter.sendMail({
+      from: `"IMS Alert" <${process.env.EMAIL_USER}>`,
+      to: Array.isArray(to) ? to.join(", ") : to,
+      subject,
+      html,
+    });
+
+    console.log(`[MAIL:SENT] Message sent to ${to}: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error("[MAIL:ERROR] Failed to send email:", error.message);
+    // Don't throw - allow application to continue even if email fails
+  }
 };
 
 const getAvgDailySales = async (sku) => {
@@ -37,6 +66,19 @@ const getAdminEmails = async () => {
 
 const sendLowStockAlert = async (product) => {
   try {
+    // Check cooldown to prevent spam
+    const lastAlert = recentAlerts.get(product.sku);
+    const now = Date.now();
+
+    if (lastAlert && now - lastAlert < COOLDOWN_MINUTES * 60 * 1000) {
+      console.log(
+        `[MAIL:COOLDOWN] Skipping alert for ${product.sku} - sent ${Math.round(
+          (now - lastAlert) / 60000
+        )} minutes ago`
+      );
+      return;
+    }
+
     const avgDailySales = await getAvgDailySales(product.sku);
     const leadTime = 5;
     const suggestedQty = Math.ceil(avgDailySales * leadTime);
@@ -57,6 +99,8 @@ const sendLowStockAlert = async (product) => {
             `,
     });
 
+    // Update last alert timestamp
+    recentAlerts.set(product.sku, now);
     console.log(`Low stock email queued for: ${adminEmails.join(", ")}`);
   } catch (err) {
     console.error("Error sending email alert:", err);

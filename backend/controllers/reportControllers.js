@@ -37,15 +37,15 @@ const getlowQuantity = async (req, res) => {
 const getDailyActivityLogs = async (req, res) => {
   const days = Math.max(1, parseInt(req.query.days) || 7);
   try {
-    const interval = `${days} days`;
     const result = await pool.query(
       `SELECT 
                 DATE(created_at) AS day, 
                 COUNT(*) AS total_logs 
             FROM inventory_logs 
-            WHERE created_at >= NOW() - INTERVAL '${interval}'
+            WHERE created_at >= NOW() - INTERVAL '1 day' * $1
             GROUP BY day 
-            ORDER BY day ASC`
+            ORDER BY day ASC`,
+      [days]
     );
     res.status(200).json(result.rows);
   } catch (err) {
