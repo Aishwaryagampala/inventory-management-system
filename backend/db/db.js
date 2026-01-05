@@ -7,9 +7,6 @@ if (typeof pwd !== "string" || pwd.length === 0) {
   console.error("DB_PASSWORD must be a non-empty string in backend/.env");
   process.exit(1);
 }
-console.log(
-  `DB connection configuration: DB_USER=${process.env.DB_USER}, DB_HOST=${process.env.DB_HOST}, DB_NAME=${process.env.DB_NAME}, DB_PORT=${process.env.DB_PORT}, DB_PASSWORD_len=${pwd.length}`
-);
 
 const { Pool } = require("pg");
 

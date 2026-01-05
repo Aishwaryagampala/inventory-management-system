@@ -13,8 +13,6 @@ const login = async (req, res) => {
       [email]
     );
 
-    console.log("Query result:", result.rows);
-
     const user = result.rows[0];
 
     if (!user) {
@@ -27,8 +25,6 @@ const login = async (req, res) => {
       console.warn("Invalid password for email:", email);
       return res.status(401).json({ message: "Invalid credentials" });
     }
-
-    console.log("Password valid for:", email);
 
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET is missing!");
