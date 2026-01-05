@@ -3,7 +3,8 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  useNavigate,
+  Navigate,
+  useLocation,
 } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import DashboardLayout from "./components/DashboardLayout";
@@ -12,18 +13,6 @@ import InventoryLogsPage from "./components/InventoryLogsPage";
 import ReportsPage from "./components/ReportsPage";
 import StaffBarcodeScannerView from "./components/StaffBarcodeScannerView";
 import "./App.css";
-
-const HomeRedirect = ({ isLoggedIn }) => {
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/dashboard/products", { replace: true });
-    } else {
-      navigate("/", { replace: true });
-    }
-  }, [isLoggedIn, navigate]);
-  return null;
-};
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -82,11 +71,16 @@ const App = () => {
   return (
     <div className="app-container">
       <Router>
-        <HomeRedirect isLoggedIn={isLoggedIn} />
         <Routes>
           <Route
             path="/"
-            element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
+            element={
+              isLoggedIn ? (
+                <Navigate to="/dashboard/products" replace />
+              ) : (
+                <LoginPage onLoginSuccess={handleLoginSuccess} />
+              )
+            }
           />
 
           {isLoggedIn ? (

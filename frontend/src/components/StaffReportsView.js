@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 const StaffReportsView = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [filterCategory, setFilterCategory] = useState(""); // Changed to empty string for "All"
   const [filterStatus, setFilterStatus] = useState(""); // Changed to empty string for "All"
   const [sortOrder, setSortOrder] = useState(""); // e.g., 'name-asc', 'name-desc', 'quantity-asc'
@@ -15,31 +16,24 @@ const StaffReportsView = () => {
     setError(null);
     console.log("Fetching staff stock reports...");
     try {
-      const token = localStorage.getItem("authToken");
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-
       const queryParams = new URLSearchParams();
-      if (searchTerm) queryParams.append("name", searchTerm); // Backend uses 'name' for search [cite: 540]
-      if (filterCategory) queryParams.append("category", filterCategory); // Backend uses 'category' [cite: 541]
+      if (searchTerm && searchTerm.trim())
+        queryParams.append("name", searchTerm);
+      if (filterCategory && filterCategory.trim())
+        queryParams.append("category", filterCategory);
 
-      // For stock status, your backend's getAllProducts supports stock_ll and stock_ul [cite: 542, 543]
-      // We need to map 'Low Stock'/'Critical' to quantity ranges or implement status logic client-side
-      // For now, I'll use backend's low stock range if applicable, otherwise frontend filter
-      if (filterStatus === "low_stock_critical") {
-        // A custom value to trigger low_stock filter
-        // This would ideally map to backend's stock_ll / stock_ul or a specific low-stock endpoint
-        // For now, will filter client-side or assume backend handles 'low_stock' as a query param
-      } else if (filterStatus === "In Stock") {
-        // If backend needs quantity range for "In Stock"
-      }
+      // Backend's getAllProducts route is GET /api/products/
+      const url = `/api/products${
+        queryParams.toString() ? "?" + queryParams.toString() : ""
+      }`;
 
-      // Backend's getAllProducts route is GET /api/products/ [cite: 646]
-      const url = `/api/products?${queryParams.toString()}`;
-
-      const response = await fetch(url, { method: "GET", headers });
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
         let data = await response.json();
@@ -108,10 +102,16 @@ const StaffReportsView = () => {
         <div className="reports-filter-group">
           <input
             type="text"
-            placeholder="Search Products by Name"
+            placeholder="Search Products by Name (press Enter)"
             className="reports-search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                setSearchTerm(searchInput);
+              }
+            }}
           />
         </div>
         <div className="reports-filter-group">
@@ -122,9 +122,8 @@ const StaffReportsView = () => {
           >
             <option value="">All Categories</option>
             <option value="Mobiles">Mobiles</option>
-            <option value="Laptops">Laptops</option>
+            <option value="Laptop">Laptop</option>
             <option value="Electronics">Electronics</option>
-            {/* Add more categories dynamically if possible, or hardcode common ones */}
           </select>
         </div>
         <div className="reports-filter-group">

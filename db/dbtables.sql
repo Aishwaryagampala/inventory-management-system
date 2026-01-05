@@ -34,8 +34,8 @@ CREATE TABLE inventory_logs(
 INSERT INTO users (username,password_hashed,email,user_role)VALUES('Staff1','$2b$10$CDb2djZFjEEIcXzREPhRReyajNR18VFojx/7dZhYy.n6Scvb/EfLy','staff1@imsasar.com','staff');
 INSERT INTO users (username,password_hashed,email,user_role)VALUES('Staff2','$2b$10$08f3VMFhJobevidFl0zAh.cjMP55iItvLty4OKpGJ399nmHhKXg6q','staff2@imsasar.com','staff');
 INSERT INTO users (username,password_hashed,email,user_role)VALUES('Staff3','$2b$10$BZt8BCJ16Rf5bJBEwhDpZ.bYfctAlzZQmy/pjhOq05hj5YIRWpuVW','staff3@imsasar.com','staff');
-INSERT INTO users (username,password_hashed,email,user_role)VALUES('Admin1','$2b$10$44YSll6Sia46TVUxGJrSwOiptuAQzxHCBfNvn4.2R7JweBcEH.eKO','imsdemo04@gmail.com','admin');
-INSERT INTO users (username,password_hashed,email,user_role)VALUES('Admin2','$2b$10$hdZkRaxB4aerI4xznhFxJOoM9txA/BZhSRLEYQMP83AjcWL9303tK','imsdemo14@gmail.com','admin');
+INSERT INTO users (username,password_hashed,email,user_role)VALUES('Admin1','$2a$10$0BJ6prNxLU6jf9SpgtY5VuXBjAVQ7yELRB34F.3.v3Nf.WdZ6YShK','imsdemo04@gmail.com','admin');
+INSERT INTO users (username,password_hashed,email,user_role)VALUES('Admin2','$2a$10$28v.eD7A886CgdEML4KzUeFKsofndk3a0t1YWJ82/5vEGvwOqyiBe','imsdemo14@gmail.com','admin');
 INSERT INTO products(sku,name,brand,category,expiry)VALUES('AP-PH-IP16','Apple iPhone16','Apple','Mobiles',NULL);
 INSERT INTO products(sku,name,brand,category,expiry)VALUES('AP-PH-IP16P','Apple iPhone16 Plus','Apple','Mobiles',NULL);
 INSERT INTO products(sku,name,brand,category,expiry)VALUES('AP-PH-IP16PRO','Apple iPhone16 Pro','Apple','Mobiles',NULL);

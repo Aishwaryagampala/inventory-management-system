@@ -9,6 +9,7 @@ const AdminInventoryLogsView = ({
   isAdmin,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
 
   const filteredProducts = useMemo(() => {
@@ -75,9 +76,15 @@ const AdminInventoryLogsView = ({
       <div className="search-filter-bar">
         <input
           type="text"
-          placeholder="🔍 Search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="🔍 Search (press Enter)"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              setSearchTerm(searchInput);
+            }
+          }}
         />
         <span className="microphone-icon">🎤</span>{" "}
         {/* Placeholder for speech-to-text */}

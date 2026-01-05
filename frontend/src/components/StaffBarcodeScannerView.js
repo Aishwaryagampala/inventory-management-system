@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import "./StaffBarcodeScannerView.css";
 import { fetchData } from "../utils/api";
@@ -11,30 +11,71 @@ const StaffBarcodeScannerView = ({
   const [scannedProduct, setScannedProduct] = useState(null);
   const [recentScans, setRecentScans] = useState([]);
   const [barcode, setBarcode] = useState("");
+  const videoRef = useRef(null);
+  const [cameraError, setCameraError] = useState(null);
+  const [manualBarcode, setManualBarcode] = useState("");
+
+  console.log("StaffBarcodeScannerView rendered");
 
   // ✅ Start camera on mount
   useEffect(() => {
+    console.log("Camera useEffect running, videoRef:", videoRef.current);
+    if (!videoRef.current) return;
+
     const codeReader = new BrowserMultiFormatReader();
     let active = true;
-    let controls = null; // store camera controls to stop later
+    let controls = null;
+    let lastScannedCode = "";
+    let lastScanTime = 0;
 
-    setStatusMessage("Camera active. Point at a barcode.");
+    const startCamera = async () => {
+      try {
+        setStatusMessage("Starting camera...");
 
-    // ✅ Use default camera and attach to <video id="video">
-    codeReader.decodeFromVideoDevice(null, "video", (result, err, ctrl) => {
-      if (ctrl && !controls) {
-        controls = ctrl; // Save the camera controls for cleanup
+        await codeReader.decodeFromVideoDevice(
+          null,
+          videoRef.current,
+          (result, err, ctrl) => {
+            if (ctrl && !controls) {
+              controls = ctrl;
+              console.log("Camera controls established");
+            }
+            if (result && active) {
+              const scannedCode = result.getText();
+              const now = Date.now();
+
+              // Prevent duplicate scans within 2 seconds
+              if (
+                scannedCode !== lastScannedCode ||
+                now - lastScanTime > 2000
+              ) {
+                console.log("Barcode detected:", scannedCode);
+                setBarcode(scannedCode);
+                lastScannedCode = scannedCode;
+                lastScanTime = now;
+              }
+            }
+            // Don't log NotFoundException as it's normal when no barcode is visible
+          }
+        );
+
+        setStatusMessage("Camera active. Point at a barcode.");
+        setCameraError(null);
+        console.log("Camera started successfully");
+      } catch (error) {
+        console.error("Camera initialization error:", error);
+        setCameraError(error.message);
+        setStatusMessage("Failed to start camera. Please check permissions.");
       }
-      if (result && active) {
-        const scannedCode = result.getText();
-        setBarcode(scannedCode);
-      }
-    });
+    };
+
+    startCamera();
 
     return () => {
       active = false;
       if (controls) {
-        controls.stop(); // ✅ Properly release the camera
+        controls.stop();
+        console.log("Camera stopped");
       }
     };
   }, []);
@@ -138,18 +179,131 @@ const StaffBarcodeScannerView = ({
   };
 
   return (
-    <div className="barcode-scanner-container">
-      <h1 className="barcode-scanner-header">Barcode Scanner</h1>
+    <div
+      className="barcode-scanner-container"
+      style={{ minHeight: "100vh", padding: "20px" }}
+    >
+      <h1
+        className="barcode-scanner-header"
+        style={{ fontSize: "32px", marginBottom: "20px" }}
+      >
+        Barcode Scanner
+      </h1>
+
+      {cameraError && (
+        <div
+          style={{
+            color: "red",
+            padding: "20px",
+            textAlign: "center",
+            backgroundColor: "#ffe6e6",
+            borderRadius: "8px",
+            marginBottom: "20px",
+          }}
+        >
+          Camera Error: {cameraError}
+        </div>
+      )}
 
       {/* ✅ Live camera feed */}
-      <video
-        id="video"
-        width="400"
-        height="300"
-        style={{ border: "1px solid black" }}
-      />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <video
+          ref={videoRef}
+          width="400"
+          height="300"
+          style={{
+            border: "2px solid #000",
+            borderRadius: "12px",
+            maxWidth: "100%",
+            backgroundColor: "#000",
+          }}
+        />
+      </div>
 
-      <div className="status-message">Status: {statusMessage}</div>
+      <div
+        className="status-message"
+        style={{
+          fontSize: "16px",
+          padding: "10px",
+          backgroundColor: "#f0f0f0",
+          borderRadius: "8px",
+          marginBottom: "20px",
+        }}
+      >
+        Status: {statusMessage}
+      </div>
+
+      {/* Manual Barcode Input */}
+      <div
+        style={{
+          padding: "20px",
+          backgroundColor: "#f9f9f9",
+          borderRadius: "12px",
+          marginBottom: "20px",
+          border: "2px solid #e0e0e0",
+        }}
+      >
+        <h3 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px" }}>
+          Manual Barcode Entry
+        </h3>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <input
+            type="text"
+            value={manualBarcode}
+            onChange={(e) => setManualBarcode(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && manualBarcode.trim()) {
+                setBarcode(manualBarcode.trim());
+                setManualBarcode("");
+              }
+            }}
+            placeholder="Enter barcode (e.g., INV-SKU001)"
+            style={{
+              flex: 1,
+              padding: "12px",
+              fontSize: "16px",
+              border: "2px solid #ddd",
+              borderRadius: "8px",
+            }}
+          />
+          <button
+            onClick={() => {
+              if (manualBarcode.trim()) {
+                setBarcode(manualBarcode.trim());
+                setManualBarcode("");
+              }
+            }}
+            style={{
+              padding: "12px 24px",
+              fontSize: "16px",
+              backgroundColor: "#1a1a1a",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Scan
+          </button>
+        </div>
+        <p
+          style={{
+            margin: "10px 0 0 0",
+            fontSize: "13px",
+            color: "#666",
+          }}
+        >
+          💡 Tip: If camera scanning isn't working, type the barcode manually
+          above
+        </p>
+      </div>
 
       {scannedProduct && (
         <div className="product-info-section">
@@ -159,10 +313,23 @@ const StaffBarcodeScannerView = ({
               <strong>Product Name:</strong> {scannedProduct.name}
             </p>
             <p>
+              <strong>SKU:</strong> {scannedProduct.sku}
+            </p>
+            <p>
+              <strong>Brand:</strong> {scannedProduct.brand || "N/A"}
+            </p>
+            <p>
               <strong>Category:</strong> {scannedProduct.category}
             </p>
             <p>
               <strong>Current Quantity:</strong> {scannedProduct.quantity}
+            </p>
+            <p>
+              <strong>Reorder Level:</strong>{" "}
+              {scannedProduct.reorder_level || "N/A"}
+            </p>
+            <p>
+              <strong>Barcode:</strong> {scannedProduct.barcode}
             </p>
           </div>
           <div className="product-action-buttons">
@@ -177,12 +344,6 @@ const StaffBarcodeScannerView = ({
               onClick={() => handleQuantityChange("remove")}
             >
               Remove Quantity
-            </button>
-            <button
-              className="product-action-button link"
-              onClick={() => onViewProductDetails(scannedProduct)}
-            >
-              View Product Details
             </button>
           </div>
         </div>
