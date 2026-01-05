@@ -37,7 +37,6 @@ const getlowQuantity = async (req, res) => {
 const getDailyActivityLogs = async (req, res) => {
   const days = Math.max(1, parseInt(req.query.days) || 7);
   try {
-    // Use a safe, properly formatted interval string
     const interval = `${days} days`;
     const result = await pool.query(
       `SELECT 

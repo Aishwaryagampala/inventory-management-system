@@ -5,7 +5,6 @@ const reportController = require("../controllers/reportControllers");
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
-// Allow both admin and staff to view reports
 router.get(
   "/category-distribution",
   authMiddleware,

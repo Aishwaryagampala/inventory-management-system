@@ -1,15 +1,3 @@
-// One-off script to generate barcodes and barcode images
-// for existing products in the database.
-// Default behavior: only process products with missing/empty barcode.
-// Flags (optional):
-//   --force     : process ALL products (overwrite barcode fields if necessary)
-//   --dry-run   : show what would be done without writing DB or files
-//
-// Usage (from backend folder, with .env configured):
-//   node generateSampleBarcodes.js
-//   node generateSampleBarcodes.js --force
-//   node generateSampleBarcodes.js --dry-run
-
 require("dotenv").config();
 
 const pool = require("./db/db");
@@ -56,7 +44,6 @@ const dryRun = argv.includes("--dry-run");
         continue;
       }
 
-      // Only update DB if force is set OR barcode was missing/empty
       if (force || !row.barcode) {
         await pool.query("UPDATE products SET barcode = $2 WHERE sku = $1", [
           sku,
@@ -64,7 +51,6 @@ const dryRun = argv.includes("--dry-run");
         ]);
       }
 
-      // Generate and save barcode image file (overwrites existing image file)
       await generateBarcodeImage(sku, barcodeText);
     }
 

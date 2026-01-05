@@ -1,21 +1,24 @@
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }); 
+require("dotenv").config({
+  path: require("path").join(__dirname, "..", ".env"),
+});
 
-// Basic validation and diagnostics to catch invalid/missing DB_PASSWORD early
 const pwd = process.env.DB_PASSWORD;
-if (typeof pwd !== 'string' || pwd.length === 0) {
-  console.error('DB_PASSWORD must be a non-empty string in backend/.env');
+if (typeof pwd !== "string" || pwd.length === 0) {
+  console.error("DB_PASSWORD must be a non-empty string in backend/.env");
   process.exit(1);
 }
-console.log(`DB connection configuration: DB_USER=${process.env.DB_USER}, DB_HOST=${process.env.DB_HOST}, DB_NAME=${process.env.DB_NAME}, DB_PORT=${process.env.DB_PORT}, DB_PASSWORD_len=${pwd.length}`);
+console.log(
+  `DB connection configuration: DB_USER=${process.env.DB_USER}, DB_HOST=${process.env.DB_HOST}, DB_NAME=${process.env.DB_NAME}, DB_PORT=${process.env.DB_PORT}, DB_PASSWORD_len=${pwd.length}`
+);
 
-const { Pool } = require('pg');
+const { Pool } = require("pg");
 
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT
+  port: process.env.DB_PORT,
 });
 
 module.exports = pool;

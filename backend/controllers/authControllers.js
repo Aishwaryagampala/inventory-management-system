@@ -1,16 +1,15 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const pool = require('../db/db');
-require('dotenv').config();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const pool = require("../db/db");
+require("dotenv").config();
 
-// LOGIN controller
 const login = async (req, res) => {
   const { email, password, rememberMe } = req.body;
   console.log("Login attempt:", email);
 
   try {
     const result = await pool.query(
-      'SELECT user_id, username, email, password_hashed AS password, user_role FROM users WHERE email = $1',
+      "SELECT user_id, username, email, password_hashed AS password, user_role FROM users WHERE email = $1",
       [email]
     );
 
@@ -39,38 +38,38 @@ const login = async (req, res) => {
     const token = jwt.sign(
       { id: user.user_id, role: user.user_role },
       process.env.JWT_SECRET,
-      { expiresIn: rememberMe ? '30d' : '1h' }
+      { expiresIn: rememberMe ? "30d" : "1h" }
     );
 
     res.cookie(process.env.COOKIE_NAME, token, {
       httpOnly: true,
       maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
       secure: false,
-      sameSite: 'lax',
+      sameSite: "lax",
     });
 
     console.log("Login success, token generated");
 
-    res.status(200).json({ message: 'Logged in successfully', role: user.user_role });
-
+    res
+      .status(200)
+      .json({ message: "Logged in successfully", role: user.user_role });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ message: 'Login error', error: err.message });
+    res.status(500).json({ message: "Login error", error: err.message });
   }
 };
 
-// LOGOUT controller
 const logout = (req, res) => {
-  res.clearCookie(process.env.COOKIE_NAME, {
-    httpOnly: true,
-    sameSite: 'Strict',
-    secure: process.env.NODE_ENV === 'production',
-  })
-  .status(200)
-  .json({ message: 'Logged out successfully' });
+  res
+    .clearCookie(process.env.COOKIE_NAME, {
+      httpOnly: true,
+      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production",
+    })
+    .status(200)
+    .json({ message: "Logged out successfully" });
 };
 
-// SESSION controller
 const session = (req, res) => {
   const token = req.cookies[process.env.COOKIE_NAME];
 
@@ -93,6 +92,5 @@ const session = (req, res) => {
 module.exports = {
   login,
   logout,
-  session
+  session,
 };
-

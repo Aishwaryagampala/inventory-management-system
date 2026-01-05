@@ -1,27 +1,12 @@
-// Lightweight mailer wrapper.
-// Swap in your preferred provider (e.g. SendGrid, Resend, Mailgun) behind sendEmail().
 const pool = require("../db/db");
 
-// Example: environment for a provider-style API
-// MAIL_FROM        - default "from" address
-// MAIL_PROVIDER_KEY - API key/token for your email provider
-//
-// For now we keep a very small abstraction that you can plug into any SDK.
 const sendEmail = async ({ to, subject, html }) => {
-  // TODO: Replace this stub with your provider SDK, e.g.:
-  //
-  // const sgMail = require('@sendgrid/mail');
-  // sgMail.setApiKey(process.env.MAIL_PROVIDER_KEY);
-  // await sgMail.send({ to, from: process.env.MAIL_FROM, subject, html });
-  //
-  // For development, we just log so nothing crashes if MAIL_PROVIDER_KEY isn't configured.
   if (!process.env.MAIL_PROVIDER_KEY) {
     console.log("[MAIL:DEV]", { to, subject });
     console.log(html);
     return;
   }
 
-  // If you configure a provider, implement the real call here.
   console.warn(
     "sendEmail is configured with MAIL_PROVIDER_KEY, but no provider SDK is wired up yet."
   );

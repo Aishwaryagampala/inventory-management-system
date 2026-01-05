@@ -25,7 +25,6 @@ const addProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  // Keep optional filtering but simplify the shape of the response
   const { sku, name, category, stock_ll, stock_ul } = req.query;
   const params = [];
   let idx = 1;

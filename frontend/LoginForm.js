@@ -23,7 +23,7 @@ const LoginForm = ({ onLoginSuccess }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // ✅ essential for cookie-based auth
+        credentials: "include",
         body: JSON.stringify({ email, password, rememberMe }),
       });
 
@@ -35,7 +35,6 @@ const LoginForm = ({ onLoginSuccess }) => {
 
       console.log("Login success:", data);
 
-      // ✅ Trigger parent callback to set isLoggedIn and role
       if (onLoginSuccess) {
         onLoginSuccess(data.role || "");
       }
