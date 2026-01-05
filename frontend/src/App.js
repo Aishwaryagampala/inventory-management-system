@@ -23,7 +23,7 @@ const App = () => {
   const handleLoginSuccess = (role) => {
     setIsLoggedIn(true);
     setUserRole(role);
-    localStorage.setItem("userRole", role); // still optional for role-based UI
+    localStorage.setItem("userRole", role);
   };
 
   const handleLogout = async () => {
@@ -42,7 +42,6 @@ const App = () => {
     window.location.href = "/";
   };
 
-  // ✅ Check login session via backend
   useEffect(() => {
     const checkSession = async () => {
       try {

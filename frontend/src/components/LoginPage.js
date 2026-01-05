@@ -23,10 +23,9 @@ const LoginPage = ({ onLoginSuccess }) => {
         </div>
         <h1 className="system-title">Inventory Management System</h1>
 
-        <div className="illustration-placeholder">{/* Illustration */}</div>
+        <div className="illustration-placeholder"></div>
       </div>
 
-      {/* ✅ Pass the callback to LoginForm */}
       <div className="login-page-right">
         <LoginForm onLoginSuccess={onLoginSuccess} />
       </div>

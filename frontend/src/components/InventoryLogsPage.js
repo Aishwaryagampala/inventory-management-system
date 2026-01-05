@@ -1,4 +1,3 @@
-// src/components/InventoryLogsPage.js
 import React, { useState, useEffect, useCallback } from "react";
 import AdminInventoryLogsView from "./AdminInventoryLogsView";
 import StaffBarcodeScannerView from "./StaffBarcodeScannerView";
@@ -6,7 +5,6 @@ import StaffBarcodeScannerView from "./StaffBarcodeScannerView";
 const InventoryLogsPage = ({ userRole }) => {
   const [logs, setLogs] = useState([]);
 
-  // Function to fetch logs data from backend for Admin view
   const fetchLogs = useCallback(async () => {
     if (!userRole || userRole.toLowerCase() !== "admin") return;
     console.log("Fetching logs for Admin view...");
@@ -42,7 +40,6 @@ const InventoryLogsPage = ({ userRole }) => {
     }
   }, [fetchLogs, userRole]);
 
-  // Case-insensitive userRole checks
   const isAdmin = userRole && userRole.toLowerCase() === "admin";
   const isStaff = userRole && userRole.toLowerCase() === "staff";
 

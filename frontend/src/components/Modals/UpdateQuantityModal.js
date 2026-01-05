@@ -1,4 +1,3 @@
-// src/components/Modals/UpdateQuantityModal.js
 import React, { useState, useEffect } from "react";
 import { fetchData } from "../../utils/api";
 

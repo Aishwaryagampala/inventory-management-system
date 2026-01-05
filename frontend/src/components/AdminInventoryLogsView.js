@@ -1,4 +1,3 @@
-// src/components/AdminInventoryLogsView.js
 import React, { useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import "./AdminInventoryLogsView.css";
@@ -54,7 +53,6 @@ const AdminInventoryLogsView = ({ logs, onRefresh }) => {
       });
     }
 
-    // Apply limit
     return filtered.slice(0, logLimit);
   }, [logs, searchTerm, filterAction, logLimit]);
 

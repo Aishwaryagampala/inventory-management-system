@@ -90,19 +90,17 @@ function ProductsPage({ userRole }) {
         amount: parseInt(amount),
       });
 
-      // Reload products
       const data = await fetchData("/products");
       if (data) {
         setProducts(data);
 
-        // Check if the updated product is now low on stock
         const updatedProduct = data.find((p) => p.sku === selectedProduct.sku);
         if (
           updatedProduct &&
           updatedProduct.quantity <= updatedProduct.reorder_level
         ) {
           toast.warning(
-            `⚠️ Low Stock Alert: ${updatedProduct.name} (${updatedProduct.sku}) is at ${updatedProduct.quantity} units (Reorder level: ${updatedProduct.reorder_level})`,
+            ` Low Stock Alert: ${updatedProduct.name} (${updatedProduct.sku}) is at ${updatedProduct.quantity} units (Reorder level: ${updatedProduct.reorder_level})`,
             { autoClose: 5000 }
           );
         }
@@ -123,7 +121,6 @@ function ProductsPage({ userRole }) {
     try {
       await fetchData(`/products/${sku}`, "DELETE");
 
-      // Reload products
       const data = await fetchData("/products");
       if (data) setProducts(data);
     } catch (err) {
@@ -140,7 +137,6 @@ function ProductsPage({ userRole }) {
     if (!selectedProduct) return;
 
     try {
-      // Add action: "update" to indicate this is a product details update, not a quantity change
       const payload = {
         ...updatedData,
         action: "update",
@@ -148,7 +144,6 @@ function ProductsPage({ userRole }) {
 
       await fetchData(`/products/${selectedProduct.sku}`, "PUT", payload);
 
-      // Reload products
       const data = await fetchData("/products");
       if (data) setProducts(data);
 
@@ -160,7 +155,6 @@ function ProductsPage({ userRole }) {
   };
 
   const handleAddProductSuccess = async () => {
-    // Reload products after adding a new one
     const data = await fetchData("/products");
     if (data) {
       setProducts(data);
@@ -330,7 +324,6 @@ function ProductsPage({ userRole }) {
         </div>
       )}
 
-      {/* Update Quantity Modal */}
       {showUpdateModal && selectedProduct && (
         <UpdateQuantityModal
           product={selectedProduct}
@@ -342,7 +335,6 @@ function ProductsPage({ userRole }) {
         />
       )}
 
-      {/* Edit Product Modal */}
       {showEditModal && selectedProduct && (
         <EditProductModal
           product={selectedProduct}
@@ -354,7 +346,6 @@ function ProductsPage({ userRole }) {
         />
       )}
 
-      {/* Add Product Modal */}
       {showAddProductModal && (
         <AddProductModal
           onClose={() => setShowAddProductModal(false)}
@@ -362,7 +353,6 @@ function ProductsPage({ userRole }) {
         />
       )}
 
-      {/* Add User Modal */}
       {showAddUserModal && (
         <AddUserModal onClose={() => setShowAddUserModal(false)} />
       )}
@@ -370,7 +360,6 @@ function ProductsPage({ userRole }) {
   );
 }
 
-// Update Quantity Modal Component
 function UpdateQuantityModal({ product, onClose, onUpdate }) {
   const [action, setAction] = useState("restock");
   const [amount, setAmount] = useState("");
@@ -440,7 +429,6 @@ function UpdateQuantityModal({ product, onClose, onUpdate }) {
   );
 }
 
-// Edit Product Modal Component
 function EditProductModal({ product, onClose, onUpdate }) {
   const [formData, setFormData] = useState({
     name: product.name || "",

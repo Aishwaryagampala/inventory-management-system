@@ -1,4 +1,3 @@
-// src/components/AdminReportsView.js
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 
@@ -8,13 +7,12 @@ const AdminReportsView = ({ onShowRecentActivity }) => {
   const [dailyActivityLogs, setDailyActivityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [timeFilter, setTimeFilter] = useState("7"); // Default to 7 days
+  const [timeFilter, setTimeFilter] = useState("7");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // ✅ Fetch Category Distribution with cookies
       const categoryDistResponse = await fetch(
         "/api/report/category-distribution",
         {
@@ -28,7 +26,6 @@ const AdminReportsView = ({ onShowRecentActivity }) => {
         setError("Failed to load category distribution.");
       }
 
-      // ✅ Fetch Low Stock Items with cookies
       const lowStockResponse = await fetch("/api/report/low-stock", {
         credentials: "include",
       });
@@ -39,7 +36,6 @@ const AdminReportsView = ({ onShowRecentActivity }) => {
         setError("Failed to load low stock trends.");
       }
 
-      // ✅ Fetch Daily Activity Logs with cookies
       const dailyLogsResponse = await fetch(
         `/api/report/daily-logs?days=${timeFilter}`,
         {

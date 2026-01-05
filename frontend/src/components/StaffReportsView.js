@@ -1,18 +1,16 @@
-// src/components/StaffReportsView.js
 import React, { useState, useEffect, useCallback } from "react";
 
 const StaffReportsView = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [filterCategory, setFilterCategory] = useState(""); // Changed to empty string for "All"
-  const [filterStatus, setFilterStatus] = useState(""); // Changed to empty string for "All"
-  const [sortOrder, setSortOrder] = useState(""); // e.g., 'name-asc', 'name-desc', 'quantity-asc'
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
 
-  // Extract unique categories from products
   useEffect(() => {
     if (products && products.length > 0) {
       const uniqueCategories = [
@@ -33,7 +31,6 @@ const StaffReportsView = () => {
       if (filterCategory && filterCategory.trim())
         queryParams.append("category", filterCategory);
 
-      // Backend's getAllProducts route is GET /api/products/
       const url = `/api/products${
         queryParams.toString() ? "?" + queryParams.toString() : ""
       }`;
@@ -50,14 +47,10 @@ const StaffReportsView = () => {
         let data = await response.json();
         console.log("Staff reports data fetched:", data);
 
-        // Frontend filtering for Status as backend's getAllProducts is more quantity based [cite: 542, 543, 593, 594]
-        // Your backend's reportController.getlowQuantity [cite: 648] is better for 'low stock' status.
-        // If you want status in getAllProducts, you'd need to modify backend product table or add logic.
         if (filterStatus) {
           data = data.filter((product) => {
-            // Assuming you have reorder_level in your product data
             if (filterStatus === "In Stock") {
-              return product.quantity > product.reorder_level + 5; // Example threshold
+              return product.quantity > product.reorder_level + 5;
             } else if (filterStatus === "Low Stock") {
               return (
                 product.quantity <= product.reorder_level + 5 &&
@@ -70,7 +63,6 @@ const StaffReportsView = () => {
           });
         }
 
-        // Client-side sorting as getAllProducts doesn't have explicit sort in backend
         if (sortOrder) {
           data.sort((a, b) => {
             if (sortOrder === "name-asc") return a.name.localeCompare(b.name);
@@ -182,13 +174,12 @@ const StaffReportsView = () => {
               products.map((product) => (
                 <tr key={product.sku}>
                   {" "}
-                  {/* Using SKU as key assuming it's unique */}
                   <td>{product.name}</td>
                   <td>{product.category}</td>
                   <td>
                     {product.quantity <= product.reorder_level
                       ? "Critical"
-                      : product.quantity <= product.reorder_level + 5 // Example threshold for low stock
+                      : product.quantity <= product.reorder_level + 5
                       ? "Low Stock"
                       : "In Stock"}
                   </td>

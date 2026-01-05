@@ -18,7 +18,6 @@ const StaffBarcodeScannerView = ({
 
   console.log("StaffBarcodeScannerView rendered");
 
-  // ✅ Start camera on mount
   useEffect(() => {
     console.log("Camera useEffect running, videoRef:", videoRef.current);
     if (!videoRef.current) return;
@@ -56,7 +55,6 @@ const StaffBarcodeScannerView = ({
                 lastScanTime = now;
               }
             }
-            // Don't log NotFoundException as it's normal when no barcode is visible
           }
         );
 
@@ -81,12 +79,10 @@ const StaffBarcodeScannerView = ({
     };
   }, []);
 
-  // ✅ Call API when a barcode is detected
   useEffect(() => {
     if (barcode) {
       handleScanBarcode(barcode);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode]);
 
   const handleScanBarcode = async (barcodeValue) => {
@@ -99,7 +95,6 @@ const StaffBarcodeScannerView = ({
       setScannedProduct(product);
       setStatusMessage(`Product found: ${product.name}`);
 
-      // ✅ Add to recent scans
       setRecentScans((prev) =>
         [
           {
@@ -138,10 +133,8 @@ const StaffBarcodeScannerView = ({
     }
 
     try {
-      // Backend expects: { action: 'restock' | 'sale', amount: number }
       const action = type === "add" ? "restock" : "sale";
 
-      // Backend returns the updated product directly
       const updatedProduct = await fetchData(
         `/products/scan/${scannedProduct.barcode}`,
         "PUT",
@@ -159,7 +152,6 @@ const StaffBarcodeScannerView = ({
         }.`
       );
 
-      // Check if product is now low on stock
       if (updatedProduct.quantity <= updatedProduct.reorder_level) {
         toast.warning(
           `⚠️ Low Stock Alert: ${updatedProduct.name} is at ${updatedProduct.quantity} units (Reorder level: ${updatedProduct.reorder_level})`,
@@ -214,7 +206,6 @@ const StaffBarcodeScannerView = ({
         </div>
       )}
 
-      {/* ✅ Live camera feed */}
       <div
         style={{
           display: "flex",
@@ -248,7 +239,6 @@ const StaffBarcodeScannerView = ({
         Status: {statusMessage}
       </div>
 
-      {/* Manual Barcode Input */}
       <div
         style={{
           padding: "20px",

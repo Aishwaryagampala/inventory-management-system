@@ -4,18 +4,13 @@ import "./AdminInventoryLogsView.css";
 
 const RecentActivityModal = ({ isOpen, onClose }) => {
   const [activities, setActivities] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Added loading state
-  const [error, setError] = useState(null); // Added error state
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchData = useCallback(async (path, method = "GET", body = null) => {
-    // Construct the full URL using the environment variable
-    // It looks for REACT_APP_API_BASE_URL from your .env file.
-    // The part after '||' is a backup if the environment variable isn't set (e.g., during local testing without .env).
     const baseUrl =
       process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
 
-    // 'path' is the specific part of the API route (like '/products' or '/logs/all-logs')
-    // We combine the baseUrl and the path to get the complete address for the API call.
     const endpoint = `${baseUrl}${path}`;
 
     const token = localStorage.getItem("authToken");
@@ -34,15 +29,13 @@ const RecentActivityModal = ({ isOpen, onClose }) => {
     }
 
     try {
-      // The fetch request now uses the full 'endpoint' which includes your base URL.
       const response = await fetch(endpoint, options);
       if (!response.ok) {
-        // Handle token expiry / unauthorized access
         if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem("authToken"); // Clear invalid token
+          localStorage.removeItem("authToken");
           alert("Session expired or unauthorized. Please log in again.");
-          window.location.href = "/login"; // Redirect to login page
-          return null; // Stop further processing
+          window.location.href = "/login";
+          return null;
         }
         const errorData = await response.json();
         throw new Error(
@@ -58,36 +51,32 @@ const RecentActivityModal = ({ isOpen, onClose }) => {
       return await response.json();
     } catch (err) {
       console.error("API call error:", err);
-      throw err; // Re-throw to be caught by specific calling functions
+      throw err;
     }
   }, []);
 
   const fetchRecentActivity = useCallback(async () => {
-    setIsLoading(true); // Set loading state
-    setError(null); // Clear previous errors
+    setIsLoading(true);
+    setError(null);
     try {
-      // Using the correct path without '/api' prefix, as fetchData handles it.
       const data = await fetchData("/logs/all-logs", "GET");
 
-      // The image shows: Date, Product, Action, Qty. Your backend's getAllLogs returns: sku, action, amount, created_at, user.
-      // Map to match the modal's expected fields. Removed 'id' from here as per your confirmation.
       const formattedActivities = data.map((log) => ({
-        // No 'id' from backend, so we don't map it here
         date: new Date(log.created_at).toLocaleDateString("en-US", {
           day: "numeric",
           month: "long",
         }),
-        product: log.sku, // Assuming log.sku is sufficient, or you might need another lookup for product name
+        product: log.sku,
         action: log.action,
-        quantityChange: log.amount, // Assuming 'amount' is the quantity changed
+        quantityChange: log.amount,
       }));
       setActivities(formattedActivities);
     } catch (err) {
       console.error("Network error fetching recent activity:", err);
-      setError(err.message || "Failed to fetch recent activity."); // Display error message
-      setActivities([]); // Clear activities on error
+      setError(err.message || "Failed to fetch recent activity.");
+      setActivities([]);
     } finally {
-      setIsLoading(false); // Clear loading state
+      setIsLoading(false);
     }
   }, [fetchData]);
 
@@ -107,19 +96,17 @@ const RecentActivityModal = ({ isOpen, onClose }) => {
         </button>
         <h2 className="modal-title">Recent Activity</h2>
 
-        {isLoading ? ( // Loading indicator
+        {isLoading ? (
           <p style={{ textAlign: "center" }}>Loading recent activity...</p>
-        ) : error ? ( // Error display
+        ) : error ? (
           <p className="error-message" style={{ textAlign: "center" }}>
             {error}
           </p>
         ) : activities.length > 0 ? (
           <div className="admin-inventory-logs-table-container">
             {" "}
-            {/* Re-using table container class if it exists */}
             <table className="admin-inventory-logs-table">
               {" "}
-              {/* Assuming a general table class is used for logs */}
               <thead>
                 <tr>
                   <th>Date</th>
@@ -129,25 +116,19 @@ const RecentActivityModal = ({ isOpen, onClose }) => {
                 </tr>
               </thead>
               <tbody>
-                {activities.map(
-                  (
-                    activity,
-                    index // ADDED 'index' back here
-                  ) => (
-                    <tr key={index}>
-                      {" "}
-                      {/* REVERTED: key={index} as 'activity.id' is not available */}
-                      <td>{activity.date}</td>
-                      <td>{activity.product}</td>
-                      <td>{activity.action}</td>
-                      <td>
-                        {activity.quantityChange > 0
-                          ? `+${activity.quantityChange}`
-                          : activity.quantityChange}
-                      </td>
-                    </tr>
-                  )
-                )}
+                {activities.map((activity, index) => (
+                  <tr key={index}>
+                    {" "}
+                    <td>{activity.date}</td>
+                    <td>{activity.product}</td>
+                    <td>{activity.action}</td>
+                    <td>
+                      {activity.quantityChange > 0
+                        ? `+${activity.quantityChange}`
+                        : activity.quantityChange}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

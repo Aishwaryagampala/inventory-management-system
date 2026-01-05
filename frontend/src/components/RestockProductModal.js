@@ -1,10 +1,9 @@
-// src/components/RestockProductModal.js
 import React, { useState } from "react";
 import "./Modal.css";
 
 const RestockProductModal = ({ isOpen, onClose, onRestockSuccess }) => {
   const [productName, setProductName] = useState("");
-  const [skuId, setSkuId] = useState(""); // SKU ID is essential for backend API
+  const [skuId, setSkuId] = useState("");
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("Electronics");
   const [quantity, setQuantity] = useState("");
@@ -26,7 +25,6 @@ const RestockProductModal = ({ isOpen, onClose, onRestockSuccess }) => {
     const restockAmount = parseInt(quantity);
 
     try {
-      // Using PATCH /:SKU/quantity for restock, sending positive quantity to add
       const response = await fetch(`/${skuId}/quantity`, {
         method: "PATCH",
         headers: {
@@ -35,20 +33,18 @@ const RestockProductModal = ({ isOpen, onClose, onRestockSuccess }) => {
         },
         body: JSON.stringify({
           quantity: restockAmount,
-          actionType: "Restock", // Backend should handle this type
+          actionType: "Restock",
         }),
       });
 
       if (response.ok) {
-        // If backend returns updated product, you can use it.
-        // const updatedProduct = await response.json();
         console.log("Restock successful for SKU:", skuId);
         alert(
           `Restocked ${restockAmount} units of ${productName} (SKU: ${skuId}) successfully!`
         );
-        onRestockSuccess(); // Callback to refresh data in parent
+        onRestockSuccess();
         onClose();
-        // Clear form fields after submission
+
         setProductName("");
         setSkuId("");
         setBrand("");
@@ -117,7 +113,6 @@ const RestockProductModal = ({ isOpen, onClose, onRestockSuccess }) => {
                 <option value="Laptop">Laptop</option>
                 <option value="Apparel">Apparel</option>
                 <option value="Books">Books</option>
-                {/* Add more categories as needed from your backend */}
               </select>
             </div>
             <div className="modal-form-group">
