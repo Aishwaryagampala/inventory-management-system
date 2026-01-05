@@ -4,8 +4,9 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background: #ffffff;
+  overflow: hidden;
 }
 
 .dashboard-header {
@@ -94,11 +95,12 @@
 }
 
 .dashboard-content {
-  flex-grow: 1;
+  flex: 1;
   padding: 40px;
   background: linear-gradient(to bottom, #fafafa 0%, #f0f0f0 100%);
   overflow-y: auto;
-  min-height: calc(100vh - 80px);
+  overflow-x: hidden;
+  height: 100%;
 }
 
 /* Responsive adjustments */
