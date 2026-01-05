@@ -1,4 +1,3 @@
-// src/components/UpdateProductModal.js
 import React, { useState, useEffect } from "react";
 import { fetchData } from "../utils/api";
 import "./Modal.css";
