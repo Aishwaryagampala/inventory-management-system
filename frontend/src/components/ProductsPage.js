@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./ProductsPage.css";
+import AddProductModal from "./Modals/AddProductModal";
+import AddUserModal from "./Modals/AddUserModal";
 
 function ProductsPage({ userRole }) {
   const [products, setProducts] = useState([]);
@@ -8,6 +10,9 @@ function ProductsPage({ userRole }) {
   const [filterCategory, setFilterCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const isAdmin = userRole && userRole.toLowerCase() === "admin";
@@ -95,6 +100,66 @@ function ProductsPage({ userRole }) {
     }
   };
 
+  const handleDeleteProduct = async (sku) => {
+    if (!window.confirm(`Are you sure you want to delete product ${sku}?`)) {
+      return;
+    }
+
+    try {
+      await fetchData(`/products/${sku}`, "DELETE");
+
+      // Reload products
+      const data = await fetchData("/products");
+      if (data) setProducts(data);
+
+      alert("Product deleted successfully");
+    } catch (err) {
+      alert(`Failed to delete product: ${err.message}`);
+    }
+  };
+
+  const handleEditProduct = (product) => {
+    setSelectedProduct(product);
+    setShowEditModal(true);
+  };
+
+  const handleProductUpdate = async (updatedData) => {
+    if (!selectedProduct) return;
+
+    try {
+      // Add action: "update" to indicate this is a product details update, not a quantity change
+      const payload = {
+        ...updatedData,
+        action: "update",
+      };
+
+      await fetchData(`/products/${selectedProduct.sku}`, "PUT", payload);
+
+      // Reload products
+      const data = await fetchData("/products");
+      if (data) setProducts(data);
+
+      setShowEditModal(false);
+      setSelectedProduct(null);
+      alert("Product updated successfully");
+    } catch (err) {
+      alert(`Failed to update product: ${err.message}`);
+    }
+  };
+
+  const handleAddProductSuccess = async () => {
+    // Reload products after adding a new one
+    const data = await fetchData("/products");
+    if (data) {
+      setProducts(data);
+      const uniqueCategories = [
+        ...new Set(data.map((p) => p.category).filter(Boolean)),
+      ];
+      setCategories(uniqueCategories);
+    }
+    setShowAddProductModal(false);
+  };
+
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
       ?.toLowerCase()
@@ -118,8 +183,26 @@ function ProductsPage({ userRole }) {
         <h1 className="products-title">Products</h1>
         {isAdmin && (
           <div className="products-actions">
-            <button className="action-button">+ Add Product</button>
-            <button className="action-button">+ Add User</button>
+            <button
+              className="action-button"
+              onClick={() => {
+                console.log("Add Product button clicked");
+                setShowAddProductModal(true);
+              }}
+              style={{ cursor: "pointer", pointerEvents: "auto" }}
+            >
+              + Add Product
+            </button>
+            <button
+              className="action-button"
+              onClick={() => {
+                console.log("Add User button clicked");
+                setShowAddUserModal(true);
+              }}
+              style={{ cursor: "pointer", pointerEvents: "auto" }}
+            >
+              + Add User
+            </button>
           </div>
         )}
       </div>
@@ -213,10 +296,16 @@ function ProductsPage({ userRole }) {
                         >
                           Update Qty
                         </button>
-                        <button className="action-button small-button">
+                        <button
+                          className="action-button small-button"
+                          onClick={() => handleEditProduct(product)}
+                        >
                           Edit
                         </button>
-                        <button className="action-button small-button delete-button">
+                        <button
+                          className="action-button small-button delete-button"
+                          onClick={() => handleDeleteProduct(product.sku)}
+                        >
                           Delete
                         </button>
                       </>
@@ -239,6 +328,31 @@ function ProductsPage({ userRole }) {
           }}
           onUpdate={handleQuantityUpdate}
         />
+      )}
+
+      {/* Edit Product Modal */}
+      {showEditModal && selectedProduct && (
+        <EditProductModal
+          product={selectedProduct}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedProduct(null);
+          }}
+          onUpdate={handleProductUpdate}
+        />
+      )}
+
+      {/* Add Product Modal */}
+      {showAddProductModal && (
+        <AddProductModal
+          onClose={() => setShowAddProductModal(false)}
+          onSuccess={handleAddProductSuccess}
+        />
+      )}
+
+      {/* Add User Modal */}
+      {showAddUserModal && (
+        <AddUserModal onClose={() => setShowAddUserModal(false)} />
       )}
     </div>
   );
@@ -299,6 +413,117 @@ function UpdateQuantityModal({ product, onClose, onUpdate }) {
           <div className="modal-buttons">
             <button type="submit" className="modal-button primary">
               Update
+            </button>
+            <button
+              type="button"
+              className="modal-button secondary"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Edit Product Modal Component
+function EditProductModal({ product, onClose, onUpdate }) {
+  const [formData, setFormData] = useState({
+    name: product.name || "",
+    brand: product.brand || "",
+    category: product.category || "",
+    quantity: product.quantity || 0,
+    reorder_level: product.reorder_level || 0,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "quantity" || name === "reorder_level"
+          ? parseInt(value) || 0
+          : value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) {
+      alert("Product name is required");
+      return;
+    }
+    onUpdate(formData);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2 className="modal-header">Edit Product</h2>
+        <div className="product-info">
+          <p>
+            <strong>SKU:</strong> {product.sku} (cannot be changed)
+          </p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-form-group">
+            <label>Product Name *</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter product name"
+              required
+            />
+          </div>
+          <div className="modal-form-group">
+            <label>Brand</label>
+            <input
+              type="text"
+              name="brand"
+              value={formData.brand}
+              onChange={handleChange}
+              placeholder="Enter brand name"
+            />
+          </div>
+          <div className="modal-form-group">
+            <label>Category</label>
+            <input
+              type="text"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              placeholder="Enter category"
+            />
+          </div>
+          <div className="modal-form-group">
+            <label>Quantity</label>
+            <input
+              type="number"
+              name="quantity"
+              min="0"
+              value={formData.quantity}
+              onChange={handleChange}
+              placeholder="Enter quantity"
+            />
+          </div>
+          <div className="modal-form-group">
+            <label>Reorder Level</label>
+            <input
+              type="number"
+              name="reorder_level"
+              min="0"
+              value={formData.reorder_level}
+              onChange={handleChange}
+              placeholder="Enter reorder level"
+            />
+          </div>
+          <div className="modal-buttons">
+            <button type="submit" className="modal-button primary">
+              Save Changes
             </button>
             <button
               type="button"

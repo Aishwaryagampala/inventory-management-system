@@ -10,6 +10,17 @@ const StaffReportsView = () => {
   const [sortOrder, setSortOrder] = useState(""); // e.g., 'name-asc', 'name-desc', 'quantity-asc'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  // Extract unique categories from products
+  useEffect(() => {
+    if (products && products.length > 0) {
+      const uniqueCategories = [
+        ...new Set(products.map((p) => p.category).filter(Boolean)),
+      ];
+      setCategories(uniqueCategories);
+    }
+  }, [products]);
 
   const fetchStaffReportsData = useCallback(async () => {
     setLoading(true);
@@ -121,9 +132,11 @@ const StaffReportsView = () => {
             onChange={(e) => setFilterCategory(e.target.value)}
           >
             <option value="">All Categories</option>
-            <option value="Mobiles">Mobiles</option>
-            <option value="Laptop">Laptop</option>
-            <option value="Electronics">Electronics</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
           </select>
         </div>
         <div className="reports-filter-group">

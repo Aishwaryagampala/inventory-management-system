@@ -11,6 +11,17 @@ const AdminInventoryLogsView = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
+  const [categories, setCategories] = useState([]);
+
+  // Extract unique categories from products
+  React.useEffect(() => {
+    if (products && products.length > 0) {
+      const uniqueCategories = [
+        ...new Set(products.map((p) => p.category).filter(Boolean)),
+      ];
+      setCategories(uniqueCategories);
+    }
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
     let filtered = products || [];
@@ -93,11 +104,12 @@ const AdminInventoryLogsView = ({
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
         >
-          <option value="All">Filter</option>
-          <option value="Mobile">Mobile</option>
-          <option value="Laptop">Laptop</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Apparel">Apparel</option>
+          <option value="All">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
           <option value="Books">Books</option>
           {/* Add more filter options based on your actual backend categories */}
         </select>

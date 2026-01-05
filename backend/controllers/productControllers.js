@@ -76,29 +76,52 @@ const getAllProducts = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { sku } = req.params;
-  const { name, category, amount, reorder_level, expiry, action } = req.body;
+  const {
+    name,
+    brand,
+    category,
+    quantity,
+    amount,
+    reorder_level,
+    expiry,
+    action,
+  } = req.body;
   const user_id = req.user.id;
+
+  console.log("updateProduct called with action:", action);
+  console.log("Request body:", req.body);
+
   try {
     let query;
-    if (action === "sale") {
+    let queryParams;
+
+    // If action is "update", just update product details without changing quantity
+    if (action === "update" || !action) {
+      query =
+        "UPDATE products SET name = $1, brand = $2, category = $3, quantity = $4, reorder_level = $5, expiry = $6 WHERE sku = $7 RETURNING *";
+      queryParams = [
+        name,
+        brand,
+        category,
+        quantity !== undefined ? quantity : 0,
+        reorder_level,
+        expiry,
+        sku,
+      ];
+    } else if (action === "sale") {
       query =
         "UPDATE products SET name = $1, brand = $2, category = $3, quantity = quantity - $4, reorder_level = $5, expiry = $6 WHERE sku = $7 RETURNING *";
+      queryParams = [name, brand, category, amount, reorder_level, expiry, sku];
     } else if (action === "return" || action === "restock") {
       query =
         "UPDATE products SET name = $1, brand = $2, category = $3, quantity = quantity + $4, reorder_level = $5, expiry = $6 WHERE sku = $7 RETURNING *";
+      queryParams = [name, brand, category, amount, reorder_level, expiry, sku];
     } else {
+      console.log("Invalid action type received:", action);
       return res.status(400).json({ message: "Invalid action type" });
     }
 
-    const result = await pool.query(query, [
-      name,
-      brand,
-      category,
-      amount,
-      reorder_level,
-      expiry,
-      sku,
-    ]);
+    const result = await pool.query(query, queryParams);
     const updatedProduct = result.rows[0];
 
     if (!updatedProduct) {
@@ -112,7 +135,11 @@ const updateProduct = async (req, res) => {
       await sendLowStockAlert(updatedProduct);
     }
 
-    await logController.createLog(sku, action, amount, user_id);
+    // Only log if there's an action (sale/restock/return)
+    if (action && action !== "update") {
+      await logController.createLog(sku, action, amount, user_id);
+    }
+
     res.status(200).json({ message: "Product updated" });
   } catch (err) {
     console.error(err);
