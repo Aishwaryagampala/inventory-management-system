@@ -1,0 +1,128 @@
+.login-form-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.role-selection {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.role-button {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.3s ease;
+}
+
+.role-button.active {
+  background-color: #333;
+  color: #fff;
+  font-weight: 600;
+}
+
+.form-title {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.login-form-elements {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+}
+
+.form-input {
+  width: calc(100% - 24px); /* Adjust for padding */
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: #4a90e2;
+}
+
+.password-group .form-input {
+  padding-right: 40px; /* Space for the eye icon */
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #888;
+}
+
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-top: -10px; /* Adjust spacing */
+}
+
+.remember-me-checkbox {
+  display: flex;
+  align-items: center;
+  color: #555;
+}
+
+.remember-me-checkbox input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: #4a90e2; /* Custom color for checkbox */
+}
+
+.forgot-password-link {
+  color: #4a90e2;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #333; /* Dark button color */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-button:hover {
+  background-color: #555;
+  transform: translateY(-2px);
+}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import "./styles/StaffBarcodeScannerView.css";
-import { fetchData } from "../api";
+import "./StaffBarcodeScannerView.css";
+import { fetchData } from "../utils/api";
 
 const StaffBarcodeScannerView = ({
   onUpdateProductQuantity,

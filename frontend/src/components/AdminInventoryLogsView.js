@@ -1,6 +1,6 @@
 // src/components/AdminInventoryLogsView.js
 import React, { useState, useMemo } from "react";
-import "./styles/AdminInventoryLogsView.css";
+import "./AdminInventoryLogsView.css";
 
 const AdminInventoryLogsView = ({
   products, // Products passed from InventoryLogsPage (fetched from backend)

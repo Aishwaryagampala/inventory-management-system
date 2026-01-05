@@ -1,7 +1,7 @@
 // src/BarcodeInteraction.js
 import React, { useState, useCallback } from "react";
-import { fetchData } from "./api";
-import "./styles/BarcodeInteraction.css";
+import { fetchData } from "../utils/api";
+import "./BarcodeInteraction.css";
 
 const BarcodeInteraction = () => {
   const [barcode, setBarcode] = useState("");

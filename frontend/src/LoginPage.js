@@ -1,6 +1,6 @@
 import React from "react";
-import LoginForm from "../LoginForm";
-import "../LoginPage.css";
+import LoginForm from "./LoginForm";
+import "./LoginPage.css";
 
 const LoginPage = ({ onLoginSuccess }) => {
   return (

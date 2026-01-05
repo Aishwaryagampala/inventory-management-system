@@ -1,0 +1,109 @@
+/* src/components/Modal.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px; /* Increased padding */
+  border-radius: 12px; /* More rounded corners */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+  width: 90%;
+  max-width: 500px; /* Max width for consistency */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Spacing between elements */
+}
+
+.modal-header {
+  font-size: 24px; /* Larger font size */
+  font-weight: 600; /* Bolder text */
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px; /* Space below header */
+}
+
+.modal-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px; /* Spacing between form groups */
+}
+
+.modal-form-group label {
+  font-size: 14px; /* Smaller label font */
+  color: #555;
+  margin-bottom: 8px; /* Space below label */
+  font-weight: 500;
+}
+
+.modal-form-group input,
+.modal-form-group select {
+  padding: 12px 15px; /* More padding */
+  border: 1px solid #ccc;
+  border-radius: 8px; /* Rounded input fields */
+  font-size: 16px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.modal-form-group input:focus,
+.modal-form-group select:focus {
+  border-color: #007bff; /* Highlight on focus */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.modal-form-row {
+  display: flex;
+  gap: 20px; /* Space between items in a row */
+}
+
+.modal-form-row .modal-form-group {
+  flex: 1; /* Distribute space evenly */
+  margin-bottom: 0; /* Remove bottom margin if part of a row */
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center; /* Center buttons */
+  gap: 15px; /* Space between buttons */
+  margin-top: 25px; /* Space above buttons */
+}
+
+.modal-button {
+  padding: 12px 25px; /* Larger buttons */
+  border: none;
+  border-radius: 8px; /* Rounded buttons */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.modal-button.primary {
+  background-color: #333; /* Dark primary button */
+  color: white;
+}
+
+.modal-button.primary:hover {
+  background-color: #555; /* Slightly lighter on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.modal-button.secondary {
+  background-color: #e0e0e0; /* Light secondary button */
+  color: #333;
+}
+
+.modal-button.secondary:hover {
+  background-color: #d0d0d0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
