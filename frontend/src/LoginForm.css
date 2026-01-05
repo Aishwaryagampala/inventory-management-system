@@ -175,10 +175,14 @@
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
   margin-top: 8px;
   letter-spacing: 0.5px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-button:hover:not(:disabled) {
@@ -188,6 +192,12 @@
 
 .login-button:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.login-button:focus {
+  outline: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .login-button:disabled {

@@ -96,8 +96,8 @@
 
 .dashboard-content {
   flex: 1;
-  padding: 40px;
-  background: linear-gradient(to bottom, #fafafa 0%, #f0f0f0 100%);
+  padding: 0;
+  background: #ffffff;
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
