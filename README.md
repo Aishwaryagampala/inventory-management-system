@@ -81,9 +81,11 @@ CREATE DATABASE ims;
 # Exit psql
 \q
 
-# Run database schema
+# Run database schema with sample data
 psql -U postgres -d ims -f db/dbtables.sql
 ```
+
+**Note:** The `dbtables.sql` file includes sample products (iPhones, Samsung phones, laptops, etc.). After running the schema, you'll need to generate barcodes for these products and add them to the database. There is generateSampleBarcodes" for the given database so the user can generate sample barcodes if needed. this wont be needed for the actual products as they come with a barcode associated with them
 
 ### 3. Backend Setup
 
@@ -135,6 +137,35 @@ echo "REACT_APP_API_BASE_URL=http://localhost:8000/api" > .env
 ```
 
 ## Running the Application
+
+### Generate Barcodes for Sample Products
+
+Before starting the application, generate barcode images for the sample products:
+
+```bash
+cd backend
+
+# Generate barcodes for products that don't have them
+node generateSampleBarcodes.js
+
+# Or force regenerate for all products
+node generateSampleBarcodes.js --force
+
+# To see what would happen without making changes
+node generateSampleBarcodes.js --dry-run
+```
+
+This will:
+
+- Create barcode values in format `INV-{SKU}` (e.g., `INV-AP-PH-IP16`)
+- Generate PNG barcode images in the `backend/barcodes/` directory
+- Update the database with barcode values
+
+**Example barcodes generated:**
+
+- `INV-AP-PH-IP16` - Apple iPhone 16
+- `INV-AP-LP-MBA-M4` - Apple Macbook Air M4
+- `INV-SS-PH-S25ULT` - Samsung Galaxy S25 Ultra
 
 ### Start Backend Server
 
