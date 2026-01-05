@@ -10,6 +10,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import ProductsPage from "./components/ProductsPage";
 import InventoryLogsPage from "./components/InventoryLogsPage";
 import ReportsPage from "./components/ReportsPage";
+import StaffBarcodeScannerView from "./components/StaffBarcodeScannerView";
 import "./App.css";
 
 const HomeRedirect = ({ isLoggedIn }) => {
@@ -103,6 +104,10 @@ const App = () => {
               <Route
                 path="inventory-logs"
                 element={<InventoryLogsPage userRole={userRole} />}
+              />
+              <Route
+                path="barcode-scanner"
+                element={<StaffBarcodeScannerView />}
               />
               <Route
                 path="reports"

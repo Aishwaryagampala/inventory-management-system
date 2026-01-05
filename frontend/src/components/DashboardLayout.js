@@ -5,15 +5,16 @@ import "./DashboardLayout.css";
 
 const DashboardLayout = ({ userRole, onLogout }) => {
   const navigate = useNavigate();
+  const isAdmin = userRole && userRole.toLowerCase() === "admin";
+  const isStaff = userRole && userRole.toLowerCase() === "staff";
 
   const handleLogoutClick = async () => {
-    await onLogout(); // Call the logout function passed from App.js
-    navigate("/"); // Redirect to the login page after logout is handled
+    await onLogout();
+    navigate("/");
   };
 
   return (
     <div className="dashboard-layout-container">
-      {/* Top Navigation Bar */}
       <header className="dashboard-header">
         <div className="header-left">
           <Link to="/dashboard/products" className="header-logo">
@@ -24,13 +25,19 @@ const DashboardLayout = ({ userRole, onLogout }) => {
           <Link to="/dashboard/products" className="nav-link">
             Products
           </Link>
-          <Link to="/dashboard/inventory-logs" className="nav-link">
-            Inventory Logs
-          </Link>
+          {isAdmin && (
+            <Link to="/dashboard/inventory-logs" className="nav-link">
+              Inventory Logs
+            </Link>
+          )}
+          {isStaff && (
+            <Link to="/dashboard/barcode-scanner" className="nav-link">
+              Barcode Scanner
+            </Link>
+          )}
           <Link to="/dashboard/reports" className="nav-link">
             Reports
           </Link>
-          {/* REMOVED: Barcode Scanner link for staff - it will now be *inside* Inventory Logs page */}
         </nav>
         <div className="header-right">
           <button onClick={handleLogoutClick} className="nav-logout-button">

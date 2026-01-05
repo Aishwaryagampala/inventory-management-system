@@ -1,10 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
+import "./ProductsPage.css";
 
-function ProductsPage() {
+function ProductsPage({ userRole }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // ✅ Generic fetch function using cookies
+  const isAdmin = userRole && userRole.toLowerCase() === "admin";
+  const isStaff = userRole && userRole.toLowerCase() === "staff";
+
   const fetchData = useCallback(async (path, method = "GET", body = null) => {
     const baseUrl =
       process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
@@ -12,42 +20,32 @@ function ProductsPage() {
 
     const options = {
       method,
-      credentials: "include", // ✅ Essential for cookie-based auth
-      headers: {
-        "Content-Type": "application/json",
-      },
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
     };
 
-    if (body) {
-      options.body = JSON.stringify(body);
-    }
+    if (body) options.body = JSON.stringify(body);
 
     try {
       const response = await fetch(endpoint, options);
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
-          alert("Session expired or unauthorized. Please log in again.");
-          window.location.href = "/login";
+          alert("Session expired. Please log in again.");
+          window.location.href = "/";
           return null;
         }
-
         const errorData = await response.json();
-        throw new Error(
-          errorData.message || `API call failed with status: ${response.status}`
-        );
+        throw new Error(errorData.message || `API error: ${response.status}`);
       }
-
-      // No content case
       if (
         response.status === 204 ||
         response.headers.get("content-length") === "0"
       ) {
         return null;
       }
-
       return await response.json();
     } catch (err) {
-      console.error("API call error:", err);
+      console.error("API error:", err);
       throw err;
     }
   }, []);
@@ -56,33 +54,262 @@ function ProductsPage() {
     const loadProducts = async () => {
       try {
         const data = await fetchData("/products");
-        if (data) setProducts(data);
+        if (data) {
+          setProducts(data);
+          const uniqueCategories = [
+            ...new Set(data.map((p) => p.category).filter(Boolean)),
+          ];
+          setCategories(uniqueCategories);
+        }
       } catch (err) {
         console.error("Failed to load products:", err.message);
       } finally {
         setLoading(false);
       }
     };
-
     loadProducts();
   }, [fetchData]);
 
-  if (loading) return <p>Loading products...</p>;
+  const handleUpdateQuantity = (product) => {
+    setSelectedProduct(product);
+    setShowUpdateModal(true);
+  };
+
+  const handleQuantityUpdate = async (action, amount) => {
+    if (!selectedProduct) return;
+
+    try {
+      await fetchData(`/products/${selectedProduct.sku}/quantity`, "PATCH", {
+        action,
+        amount: parseInt(amount),
+      });
+
+      // Reload products
+      const data = await fetchData("/products");
+      if (data) setProducts(data);
+
+      setShowUpdateModal(false);
+      setSelectedProduct(null);
+    } catch (err) {
+      alert(`Failed to update quantity: ${err.message}`);
+    }
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      !filterCategory || product.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  if (loading) {
+    return (
+      <div className="products-page-container">
+        <div className="loading-spinner">Loading products...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h2>Products</h2>
-      {products.length === 0 ? (
-        <p>No products available.</p>
+    <div className="products-page-container">
+      <div className="products-header-section">
+        <h1 className="products-title">Products</h1>
+        {isAdmin && (
+          <div className="products-actions">
+            <button className="action-button">+ Add Product</button>
+            <button className="action-button">+ Add User</button>
+          </div>
+        )}
+      </div>
+
+      <div className="products-filter-row">
+        <div className="search-input-group">
+          <svg
+            className="search-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path
+              d="M21 21l-4.35-4.35"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="filter-dropdown-group">
+          <select
+            className="filter-dropdown"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            <option value="">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {filteredProducts.length === 0 ? (
+        <div className="no-products-message">
+          <p>No products found.</p>
+        </div>
       ) : (
-        <ul>
-          {products.map((product) => (
-            <li key={product.id}>
-              <strong>{product.name}</strong> — {product.quantity} in stock
-            </li>
-          ))}
-        </ul>
+        <div className="products-table-container">
+          <table className="products-table">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.map((product) => (
+                <tr key={product.product_id}>
+                  <td>{product.sku}</td>
+                  <td>{product.name}</td>
+                  <td>{product.brand}</td>
+                  <td>{product.category}</td>
+                  <td>{product.quantity}</td>
+                  <td>
+                    {isStaff && (
+                      <button
+                        className="action-button small-button"
+                        onClick={() => handleUpdateQuantity(product)}
+                      >
+                        Update Qty
+                      </button>
+                    )}
+                    {isAdmin && (
+                      <>
+                        <button
+                          className="action-button small-button"
+                          onClick={() => handleUpdateQuantity(product)}
+                        >
+                          Update Qty
+                        </button>
+                        <button className="action-button small-button">
+                          Edit
+                        </button>
+                        <button className="action-button small-button delete-button">
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
+
+      {/* Update Quantity Modal */}
+      {showUpdateModal && selectedProduct && (
+        <UpdateQuantityModal
+          product={selectedProduct}
+          onClose={() => {
+            setShowUpdateModal(false);
+            setSelectedProduct(null);
+          }}
+          onUpdate={handleQuantityUpdate}
+        />
+      )}
+    </div>
+  );
+}
+
+// Update Quantity Modal Component
+function UpdateQuantityModal({ product, onClose, onUpdate }) {
+  const [action, setAction] = useState("restock");
+  const [amount, setAmount] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!amount || parseInt(amount) <= 0) {
+      alert("Please enter a valid quantity");
+      return;
+    }
+    onUpdate(action, amount);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2 className="modal-header">Update Quantity</h2>
+        <div className="product-info">
+          <p>
+            <strong>Product:</strong> {product.name}
+          </p>
+          <p>
+            <strong>SKU:</strong> {product.sku}
+          </p>
+          <p>
+            <strong>Current Quantity:</strong> {product.quantity}
+          </p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-form-group">
+            <label>Action</label>
+            <select
+              value={action}
+              onChange={(e) => setAction(e.target.value)}
+              required
+            >
+              <option value="restock">Add Stock (Restock)</option>
+              <option value="sale">Remove Stock (Sale)</option>
+            </select>
+          </div>
+          <div className="modal-form-group">
+            <label>Quantity</label>
+            <input
+              type="number"
+              min="1"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Enter quantity"
+              required
+            />
+          </div>
+          <div className="modal-buttons">
+            <button type="submit" className="modal-button primary">
+              Update
+            </button>
+            <button
+              type="button"
+              className="modal-button secondary"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
