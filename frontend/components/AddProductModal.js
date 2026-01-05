@@ -1,46 +1,35 @@
 // src/components/Modals/AddProductModal.js
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { fetchData } from "../utils/api";
 
 const AddProductModal = ({ onClose, onSuccess }) => {
-  const [productName, setProductName] = useState('');
-  const [imageURL, setImageURL] = useState('');
-  const [category, setCategory] = useState('Electronics');
-  const [quantity, setQuantity] = useState('');
-  const [brand, setBrand] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [sku, setSku] = useState("");
+  const [productName, setProductName] = useState("");
+  const [imageURL, setImageURL] = useState("");
+  const [category, setCategory] = useState("Electronics");
+  const [quantity, setQuantity] = useState("");
+  const [brand, setBrand] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
+    setErrorMessage("");
 
     try {
-      const response = await fetch('/api/products/add', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          // 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          productName,
-          imageURL,
-          category,
-          quantity: parseInt(quantity),
-          brand
-        }),
+      // Use centralized helper so cookies are included and errors handled consistently
+      await fetchData("/products/add", "POST", {
+        sku,
+        name: productName,
+        brand,
+        category,
+        quantity: parseInt(quantity) || 0,
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Product added successfully:', result);
-        onSuccess();
-      } else {
-        const errorData = await response.json();
-        setErrorMessage(errorData.message || 'Failed to add product.');
-      }
+      console.log("Product added successfully");
+      onSuccess();
     } catch (error) {
-      setErrorMessage('Network error. Could not add product.');
-      console.error('Error adding product:', error);
+      setErrorMessage(error.message || "Failed to add product.");
+      console.error("Error adding product:", error);
     }
   };
 
@@ -50,6 +39,15 @@ const AddProductModal = ({ onClose, onSuccess }) => {
         <h2 className="modal-title">Add Product</h2>
         <form onSubmit={handleSubmit} className="modal-form">
           {errorMessage && <p className="error-message">{errorMessage}</p>}
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="SKU (Unique ID)"
+              value={sku}
+              onChange={(e) => setSku(e.target.value)}
+              required
+            />
+          </div>
           <div className="form-group">
             <input
               type="text"
@@ -69,7 +67,11 @@ const AddProductModal = ({ onClose, onSuccess }) => {
           </div>
           <div className="form-row">
             <div className="form-group flex-half">
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="modal-select">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="modal-select"
+              >
                 <option value="Electronics">Electronics</option>
                 <option value="Mobiles">Mobiles</option>
                 <option value="Laptops">Laptops</option>
@@ -96,8 +98,16 @@ const AddProductModal = ({ onClose, onSuccess }) => {
             />
           </div>
           <div className="modal-actions">
-            <button type="submit" className="modal-button primary">Add Product</button>
-            <button type="button" className="modal-button secondary" onClick={onClose}>Cancel</button>
+            <button type="submit" className="modal-button primary">
+              Add Product
+            </button>
+            <button
+              type="button"
+              className="modal-button secondary"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
           </div>
         </form>
       </div>

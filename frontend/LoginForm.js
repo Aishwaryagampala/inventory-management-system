@@ -1,56 +1,58 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './LoginForm.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./styles/LoginForm.css";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
 
 const LoginForm = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       const res = await fetch(`${API_BASE}/auth/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include', // ✅ essential for cookie-based auth
+        credentials: "include", // ✅ essential for cookie-based auth
         body: JSON.stringify({ email, password, rememberMe }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || "Login failed");
       }
 
-      console.log('Login success:', data);
+      console.log("Login success:", data);
 
       // ✅ Trigger parent callback to set isLoggedIn and role
       if (onLoginSuccess) {
-        onLoginSuccess(data.role || '');
+        onLoginSuccess(data.role || "");
       }
 
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '2rem' }}>
+    <div style={{ maxWidth: "400px", margin: "auto", padding: "2rem" }}>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Email:</label><br />
+          <label>Email:</label>
+          <br />
           <input
             type="email"
             value={email}
@@ -59,7 +61,8 @@ const LoginForm = ({ onLoginSuccess }) => {
           />
         </div>
         <div>
-          <label>Password:</label><br />
+          <label>Password:</label>
+          <br />
           <input
             type="password"
             value={password}
@@ -78,7 +81,7 @@ const LoginForm = ({ onLoginSuccess }) => {
           </label>
         </div>
         <button type="submit">Login</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
   );

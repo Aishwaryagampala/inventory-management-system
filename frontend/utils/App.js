@@ -1,32 +1,32 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import '../styles/App.css';
+import React, { useEffect, useState, useCallback } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import "../styles/App.css";
 
-import LoginPage from '../components/LoginPage';
-import DashboardLayout from '../components/DashboardLayout';
-import ProductsPage from '../components/ProductsPage';
-import InventoryLogsPage from '../components/InventoryLogsPage';
-import ReportsPage from '../components/ReportsPage';
-import { fetchData } from '../api';
+import LoginPage from "../components/LoginPage";
+import DashboardLayout from "../components/DashboardLayout";
+import ProductsPage from "../components/ProductsPage";
+import InventoryLogsPage from "../components/InventoryLogsPage";
+import ReportsPage from "../components/ReportsPage";
+import { fetchData } from "./api";
 
 function App() {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState("");
 
   const loadSession = useCallback(async () => {
     try {
-      const data = await fetchData('/auth/session', 'GET');
+      const data = await fetchData("/auth/session", "GET");
       if (data && data.loggedIn) {
         setIsLoggedIn(true);
-        setUserRole(data.role || '');
+        setUserRole(data.role || "");
       } else {
         setIsLoggedIn(false);
-        setUserRole('');
+        setUserRole("");
       }
     } catch {
       setIsLoggedIn(false);
-      setUserRole('');
+      setUserRole("");
     } finally {
       setIsCheckingSession(false);
     }
@@ -38,22 +38,26 @@ function App() {
 
   const handleLoginSuccess = (role) => {
     setIsLoggedIn(true);
-    setUserRole(role || '');
+    setUserRole(role || "");
   };
 
   const handleLogout = async () => {
     try {
-      await fetchData('/auth/logout', 'POST');
+      await fetchData("/auth/logout", "POST");
     } catch {
       // ignore logout errors, just clear state
     } finally {
       setIsLoggedIn(false);
-      setUserRole('');
+      setUserRole("");
     }
   };
 
   if (isCheckingSession) {
-    return <div className="app-container"><p>Loading session...</p></div>;
+    return (
+      <div className="app-container">
+        <p>Loading session...</p>
+      </div>
+    );
   }
 
   return (
@@ -63,32 +67,44 @@ function App() {
           <Route
             path="/"
             element={
-              isLoggedIn
-                ? <Navigate to="/dashboard/products" replace />
-                : <LoginPage onLoginSuccess={handleLoginSuccess} />
+              isLoggedIn ? (
+                <Navigate to="/dashboard/products" replace />
+              ) : (
+                <LoginPage onLoginSuccess={handleLoginSuccess} />
+              )
             }
           />
 
           <Route
             path="/dashboard"
             element={
-              isLoggedIn
-                ? <DashboardLayout userRole={userRole} onLogout={handleLogout} />
-                : <Navigate to="/" replace />
+              isLoggedIn ? (
+                <DashboardLayout userRole={userRole} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/" replace />
+              )
             }
           >
             <Route index element={<Navigate to="products" replace />} />
             <Route path="products" element={<ProductsPage />} />
-            <Route path="inventory-logs" element={<InventoryLogsPage userRole={userRole} />} />
-            <Route path="reports" element={<ReportsPage userRole={userRole} />} />
+            <Route
+              path="inventory-logs"
+              element={<InventoryLogsPage userRole={userRole} />}
+            />
+            <Route
+              path="reports"
+              element={<ReportsPage userRole={userRole} />}
+            />
           </Route>
 
           <Route
             path="*"
             element={
-              isLoggedIn
-                ? <Navigate to="/dashboard/products" replace />
-                : <Navigate to="/" replace />
+              isLoggedIn ? (
+                <Navigate to="/dashboard/products" replace />
+              ) : (
+                <Navigate to="/" replace />
+              )
             }
           />
         </Routes>
@@ -98,5 +114,3 @@ function App() {
 }
 
 export default App;
-
-

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { fetchData } from '../api';
+import React, { useState, useEffect, useCallback } from "react";
+import { fetchData } from "../utils/api";
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -8,10 +8,10 @@ function ProductsPage() {
   // Load products list from backend (uses existing /api/products route)
   const loadProducts = useCallback(async () => {
     try {
-      const data = await fetchData('/products', 'GET');
+      const data = await fetchData("/products", "GET");
       if (data) setProducts(data);
     } catch (err) {
-      console.error('Failed to load products:', err.message);
+      console.error("Failed to load products:", err.message);
     } finally {
       setLoading(false);
     }
@@ -46,10 +46,12 @@ function ProductsPage() {
               <tr key={p.sku}>
                 <td>{p.sku}</td>
                 <td>{p.name}</td>
-                <td>{p.category || '-'}</td>
+                <td>{p.category || "-"}</td>
                 <td>{p.quantity}</td>
                 <td>{p.reorder_level}</td>
-                <td>{p.expiry ? new Date(p.expiry).toLocaleDateString() : '-'}</td>
+                <td>
+                  {p.expiry ? new Date(p.expiry).toLocaleDateString() : "-"}
+                </td>
               </tr>
             ))}
           </tbody>

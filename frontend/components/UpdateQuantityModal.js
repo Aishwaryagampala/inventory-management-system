@@ -1,39 +1,42 @@
 // src/components/Modals/UpdateQuantityModal.js
-import React, { useState, useEffect } from 'react';
-import { fetchData } from '../../utils/api';
+import React, { useState, useEffect } from "react";
+import { fetchData } from "../utils/api";
 
 const UpdateQuantityModal = ({ onClose, onSuccess }) => {
-  const [productName, setProductName] = useState('');
-  const [skuId, setSkuId] = useState('');
-  const [brandName, setBrandName] = useState('');
-  const [currentStock, setCurrentStock] = useState('');
-  const [updateQuantity, setUpdateQuantity] = useState('');
-  const [updateAmount, setUpdateAmount] = useState('');
-  const [action, setAction] = useState('Sales');
-  const [category, setCategory] = useState('Electronics');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [productName, setProductName] = useState("");
+  const [skuId, setSkuId] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const [currentStock, setCurrentStock] = useState("");
+  const [updateQuantity, setUpdateQuantity] = useState("");
+  const [updateAmount, setUpdateAmount] = useState("");
+  const [action, setAction] = useState("Sales");
+  const [category, setCategory] = useState("Electronics");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (skuId) {
       const fetchCurrentStock = async () => {
         try {
-          const response = await fetchData(`/scan/${skuId}`, { method: 'GET' });
-          if (response.ok) {
-            const data = await response.json();
-            setCurrentStock(data.currentStock || '');
-            setProductName(data.productName || '');
-            setBrandName(data.brandName || '');
-            setCategory(data.category || 'Electronics');
+          // Use products list endpoint with a sku filter to fetch product details
+          const data = await fetchData(`/products?sku=${skuId}`, "GET");
+          const product = Array.isArray(data) ? data[0] : data;
+          if (product) {
+            setCurrentStock(product.quantity || "");
+            setProductName(product.name || "");
+            setBrandName(product.brand || "");
+            setCategory(product.category || "Electronics");
           } else {
-            console.error('Failed to fetch product details for SKU:', skuId);
-            setCurrentStock('');
-            setProductName('');
-            setBrandName('');
-            setCategory('Electronics');
+            setCurrentStock("");
+            setProductName("");
+            setBrandName("");
+            setCategory("Electronics");
           }
         } catch (error) {
-          console.error('Network error fetching product details:', error);
-          setCurrentStock('');
+          console.error("Network error fetching product details:", error);
+          setCurrentStock("");
+          setProductName("");
+          setBrandName("");
+          setCategory("Electronics");
         }
       };
       fetchCurrentStock();
@@ -42,41 +45,28 @@ const UpdateQuantityModal = ({ onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
+    setErrorMessage("");
 
     if (!skuId) {
-      setErrorMessage('SKU ID is required to update a product.');
+      setErrorMessage("SKU ID is required to update a product.");
       return;
     }
 
     try {
-      const response = await fetchData(`/scan/${skuId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          productName,
-          brandName,
-          updateQuantity: parseInt(updateQuantity),
-          updateAmount: parseInt(updateAmount),
-          action,
-          category,
-        }),
+      // Use the admin product update endpoint: PUT /api/products/:sku
+      await fetchData(`/products/${skuId}`, "PUT", {
+        name: productName,
+        brand: brandName,
+        category,
+        amount: parseInt(updateQuantity), // backend expects 'amount' and uses 'action' to apply +/-
+        action: action.toLowerCase(),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Product updated successfully:', data);
-        onSuccess();
-      } else {
-        const errorData = await response.json();
-        setErrorMessage(errorData.message || 'Failed to update quantity.');
-      }
+      console.log("Product updated successfully");
+      onSuccess();
     } catch (error) {
-      setErrorMessage('Network error. Could not update quantity.');
-      console.error('Error updating quantity:', error);
+      setErrorMessage(error.message || "Failed to update quantity.");
+      console.error("Error updating quantity:", error);
     }
   };
 
@@ -140,14 +130,22 @@ const UpdateQuantityModal = ({ onClose, onSuccess }) => {
           </div>
           <div className="form-row">
             <div className="form-group flex-half">
-              <select value={action} onChange={(e) => setAction(e.target.value)} className="modal-select">
+              <select
+                value={action}
+                onChange={(e) => setAction(e.target.value)}
+                className="modal-select"
+              >
                 <option value="Sales">Sales</option>
                 <option value="Purchase">Purchase</option>
                 <option value="Return">Return</option>
               </select>
             </div>
             <div className="form-group flex-half">
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="modal-select">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="modal-select"
+              >
                 <option value="Electronics">Electronics</option>
                 <option value="Mobiles">Mobiles</option>
                 <option value="Laptops">Laptops</option>
@@ -156,8 +154,16 @@ const UpdateQuantityModal = ({ onClose, onSuccess }) => {
             </div>
           </div>
           <div className="modal-actions">
-            <button type="submit" className="modal-button primary">Update Product</button>
-            <button type="button" className="modal-button secondary" onClick={onClose}>Cancel</button>
+            <button type="submit" className="modal-button primary">
+              Update Product
+            </button>
+            <button
+              type="button"
+              className="modal-button secondary"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
           </div>
         </form>
       </div>
