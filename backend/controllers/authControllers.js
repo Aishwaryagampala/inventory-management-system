@@ -37,11 +37,13 @@ const login = async (req, res) => {
       { expiresIn: rememberMe ? "30d" : "1h" }
     );
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie(process.env.COOKIE_NAME, token, {
       httpOnly: true,
       maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
-      secure: false,
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "strict" : "lax",
     });
 
     console.log("Login success, token generated");
@@ -56,11 +58,13 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res
     .clearCookie(process.env.COOKIE_NAME, {
       httpOnly: true,
-      sameSite: "Strict",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: isProduction ? "strict" : "lax",
+      secure: isProduction,
     })
     .status(200)
     .json({ message: "Logged out successfully" });

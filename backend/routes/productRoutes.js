@@ -4,11 +4,17 @@ const productController = require("../controllers/productControllers");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
+const {
+  validate,
+  addProductSchema,
+  updateProductSchema,
+} = require("../middleware/validationMiddleware");
 
 router.post(
   "/add",
   authMiddleware,
   roleMiddleware(["admin"]),
+  validate(addProductSchema),
   productController.addProduct
 );
 router.get(
@@ -21,6 +27,7 @@ router.put(
   "/:sku",
   authMiddleware,
   roleMiddleware(["admin"]),
+  validate(updateProductSchema),
   productController.updateProduct
 );
 router.patch(

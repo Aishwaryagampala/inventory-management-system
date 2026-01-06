@@ -8,7 +8,7 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 router.get(
   "/all-logs",
   authMiddleware,
-  roleMiddleware(["admin"]),
+  roleMiddleware(["admin", "staff"]),
   logController.getAllLogs
 );
 router.delete(

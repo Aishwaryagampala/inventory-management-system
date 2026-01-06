@@ -1,84 +1,47 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./Modal.css";
 import "./AdminInventoryLogsView.css";
+import { fetchData } from "../utils/api";
 
 const RecentActivityModal = ({ isOpen, onClose }) => {
   const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchData = useCallback(async (path, method = "GET", body = null) => {
-    const baseUrl =
-      process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
-
-    const endpoint = `${baseUrl}${path}`;
-
-    const token = localStorage.getItem("authToken");
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-
-    const options = {
-      method,
-      headers,
-    };
-
-    if (body) {
-      options.body = JSON.stringify(body);
-    }
-
-    try {
-      const response = await fetch(endpoint, options);
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem("authToken");
-          alert("Session expired or unauthorized. Please log in again.");
-          window.location.href = "/login";
-          return null;
-        }
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `API call failed with status: ${response.status}`
-        );
-      }
-      if (
-        response.status === 204 ||
-        response.headers.get("content-length") === "0"
-      ) {
-        return null;
-      }
-      return await response.json();
-    } catch (err) {
-      console.error("API call error:", err);
-      throw err;
-    }
-  }, []);
-
   const fetchRecentActivity = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
+      console.log("Fetching recent activity from /logs/all-logs");
       const data = await fetchData("/logs/all-logs", "GET");
 
-      const formattedActivities = data.map((log) => ({
-        date: new Date(log.created_at).toLocaleDateString("en-US", {
-          day: "numeric",
-          month: "long",
-        }),
-        product: log.sku,
-        action: log.action,
-        quantityChange: log.amount,
-      }));
-      setActivities(formattedActivities);
+      console.log("Received data:", data);
+
+      if (data && Array.isArray(data)) {
+        const formattedActivities = data.map((log) => ({
+          date: new Date(log.created_at).toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "long",
+          }),
+          product: log.sku,
+          action: log.action,
+          quantityChange: log.amount,
+        }));
+        setActivities(formattedActivities);
+      } else {
+        console.log("No data or data is not an array");
+        setActivities([]);
+      }
     } catch (err) {
-      console.error("Network error fetching recent activity:", err);
+      console.error("Error fetching recent activity:", err);
+      console.error("Error message:", err.message);
+      console.error("Error stack:", err.stack);
       setError(err.message || "Failed to fetch recent activity.");
       setActivities([]);
     } finally {
       setIsLoading(false);
     }
-  }, [fetchData]);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
