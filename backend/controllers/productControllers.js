@@ -10,7 +10,6 @@ const addProduct = async (req, res) => {
     req.body;
   let { barcode } = req.body;
 
-  // Generate barcode if not provided
   if (!barcode || barcode.trim() === "") {
     barcode = `INV-${sku}`;
   }
@@ -22,7 +21,6 @@ const addProduct = async (req, res) => {
       [sku, name, brand, barcode, category, quantity, reorder_level, expiry]
     );
 
-    // Generate barcode image if using auto-generated barcode
     let barcodeUrl = null;
     if (barcode === `INV-${sku}`) {
       barcodeUrl = await barCode.generateBarcodeImage(sku, barcode);
