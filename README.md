@@ -85,7 +85,7 @@ CREATE DATABASE ims;
 psql -U postgres -d ims -f db/dbtables.sql
 ```
 
-**Note:** The `dbtables.sql` file includes sample products (iPhones, Samsung phones, laptops, etc.). After running the schema, you'll need to generate barcodes for these products and add them to the database. There is generateSampleBarcodes" for the given database so the user can generate sample barcodes if needed. this wont be needed for the actual products as they come with a barcode associated with them
+**Note:** The `dbtables.sql` file includes sample products (iPhones, Samsung phones, laptops, etc.). After running the schema, you'll need to generate barcodes for these products and add them to the database. There is a "generateSampleBarcodes.js" file for the given database so the user can generate sample barcodes if needed.
 
 ### 3. Backend Setup
 
@@ -105,23 +105,24 @@ nano .env
 **Required .env variables:**
 
 ```env
-PORT=8000
+PORT=port_number
 
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=ims
+DB_USER=user
+DB_PASSWORD=password
+DB_HOST=host
+DB_PORT=port
+DB_NAME=nameofdb
 
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET=secret_jwt_key
 
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
+EMAIL_USER=email_for_smtp
+EMAIL_PASS=password_for_email
+SMTP_HOST=host_for_smtp
+SMTP_PORT=port_for_smtp
 
-COOKIE_NAME=ims_auth_session_token
-BARCODE_DIR=barcodes/
+COOKIE_NAME=tokeen_name
+
+BARCODE_DIR=where_barcodes_are_saved/
 ```
 
 ### 4. Frontend Setup
@@ -141,6 +142,7 @@ echo "REACT_APP_API_BASE_URL=http://localhost:8000/api" > .env
 ### Generate Barcodes for Sample Products
 
 Before starting the application, generate barcode images for the sample products:
+You MUST configure your .env file to include a path for where the images need to be saved.
 
 ```bash
 cd backend
@@ -189,12 +191,12 @@ App runs on **http://localhost:3000**
 
 **Admin Users:**
 
-- Email: `imsdemo04@gmail.com` / Password: `Admin@123`
-- Email: `imsdemo14@gmail.com` / Password: `Admin@123`
+- Email: `admin1@imsasar.com` / Password: `Admin@123`
+- Email: `admin2@imsasar.com` / Password: `Admin@123`
 
 **Staff User:**
 
-- Email: `staffuser@example.com` / Password: `Staff@123`
+- Email: `staff1@imsasar.com` / Password: `staff01`
 
 _Note: Update these in production!_
 

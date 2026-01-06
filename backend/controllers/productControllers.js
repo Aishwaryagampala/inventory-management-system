@@ -8,16 +8,31 @@ const { sendLowStockAlert } = require("../utils/mailer");
 const addProduct = async (req, res) => {
   const { sku, name, brand, category, quantity, reorder_level, expiry } =
     req.body;
-  const barcode = `INV-${sku}`;
+  let { barcode } = req.body;
+
+  // Generate barcode if not provided
+  if (!barcode || barcode.trim() === "") {
+    barcode = `INV-${sku}`;
+  }
+
   try {
     const user_id = req.user.id;
     await pool.query(
       "INSERT INTO products (sku, name, brand, barcode, category, quantity, reorder_level, expiry) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
       [sku, name, brand, barcode, category, quantity, reorder_level, expiry]
     );
-    const barcodeUrl = await barCode.generateBarcodeImage(sku, barcode);
+
+    // Generate barcode image if using auto-generated barcode
+    let barcodeUrl = null;
+    if (barcode === `INV-${sku}`) {
+      barcodeUrl = await barCode.generateBarcodeImage(sku, barcode);
+    }
+
     await logController.createLog(sku, "added", quantity, user_id);
-    res.status(201).json({ message: "Product added successfully", barcodeUrl });
+    res.status(201).json({
+      message: "Product added successfully",
+      ...(barcodeUrl && { barcodeUrl }),
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error adding product" });

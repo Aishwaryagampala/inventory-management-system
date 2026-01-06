@@ -5,6 +5,7 @@ import "../Modal.css";
 const AddProductModal = ({ onClose, onSuccess }) => {
   const [sku, setSku] = useState("");
   const [productName, setProductName] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [category, setCategory] = useState("Electronics");
   const [customCategory, setCustomCategory] = useState("");
@@ -28,6 +29,7 @@ const AddProductModal = ({ onClose, onSuccess }) => {
         body: JSON.stringify({
           sku,
           name: productName,
+          barcode,
           imageURL,
           category: showCustomCategory ? customCategory : category,
           quantity: parseInt(quantity),
@@ -73,6 +75,18 @@ const AddProductModal = ({ onClose, onSuccess }) => {
               onChange={(e) => setSku(e.target.value)}
               required
             />
+          </div>
+          <div className="modal-form-group">
+            <label>Barcode (Optional)</label>
+            <input
+              type="text"
+              placeholder="Enter barcode or leave empty to auto-generate"
+              value={barcode}
+              onChange={(e) => setBarcode(e.target.value)}
+            />
+            <small style={{ color: "#666", fontSize: "12px" }}>
+              If empty, barcode will be auto-generated as INV-{sku || "SKU"}
+            </small>
           </div>
           <div className="modal-form-group">
             <label>Product Name</label>

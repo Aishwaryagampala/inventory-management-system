@@ -13,7 +13,7 @@ const generateBarcodeImage = async (sku, barcodeText) => {
       textxalign: "center",
     });
 
-    const barcodeDir = path.join(__dirname, "..", "barcodes");
+    const barcodeDir = process.env.BARCODE_DIR;
     const filePath = path.join(barcodeDir, `${sku}.png`);
 
     if (!fs.existsSync(barcodeDir)) {
