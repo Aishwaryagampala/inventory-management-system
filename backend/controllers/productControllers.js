@@ -18,7 +18,7 @@ const addProduct = async (req, res) => {
     const user_id = req.user.id;
     await pool.query(
       "INSERT INTO products (sku, name, brand, barcode, category, quantity, reorder_level, expiry) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-      [sku, name, brand, barcode, category, quantity, reorder_level, expiry]
+      [sku, name, brand, barcode, category, quantity, reorder_level, expiry],
     );
 
     let barcodeUrl = null;
@@ -104,6 +104,9 @@ const updateProduct = async (req, res) => {
   console.log("updateProduct called with action:", action);
   console.log("Request body:", req.body);
 
+  // Convert empty string expiry to null for database
+  const expiryValue = expiry && expiry !== "" ? expiry : null;
+
   try {
     let query;
     let queryParams;
@@ -118,17 +121,33 @@ const updateProduct = async (req, res) => {
         category,
         quantity !== undefined ? quantity : 0,
         reorder_level,
-        expiry,
+        expiryValue,
         sku,
       ];
     } else if (action === "sale") {
       query =
         "UPDATE products SET name = $1, brand = $2, category = $3, quantity = quantity - $4, reorder_level = $5, expiry = $6 WHERE sku = $7 RETURNING *";
-      queryParams = [name, brand, category, amount, reorder_level, expiry, sku];
+      queryParams = [
+        name,
+        brand,
+        category,
+        amount,
+        reorder_level,
+        expiryValue,
+        sku,
+      ];
     } else if (action === "return" || action === "restock") {
       query =
         "UPDATE products SET name = $1, brand = $2, category = $3, quantity = quantity + $4, reorder_level = $5, expiry = $6 WHERE sku = $7 RETURNING *";
-      queryParams = [name, brand, category, amount, reorder_level, expiry, sku];
+      queryParams = [
+        name,
+        brand,
+        category,
+        amount,
+        reorder_level,
+        expiryValue,
+        sku,
+      ];
     } else {
       console.log("Invalid action type received:", action);
       return res.status(400).json({ message: "Invalid action type" });
@@ -215,7 +234,7 @@ const deleteProduct = async (req, res) => {
   try {
     const result = await pool.query(
       "DELETE FROM products WHERE sku = $1 RETURNING *",
-      [sku]
+      [sku],
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Product not found" });
@@ -271,7 +290,7 @@ const getProductByBarcode = async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM products WHERE barcode = $1",
-      [barcode]
+      [barcode],
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Product not found" });

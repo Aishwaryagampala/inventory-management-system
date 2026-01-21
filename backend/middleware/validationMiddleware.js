@@ -48,17 +48,15 @@ const addProductSchema = Joi.object({
     "string.max": "Product name must not exceed 255 characters",
     "any.required": "Product name is required",
   }),
-  description: Joi.string().allow("", null).optional(),
+  brand: Joi.string().allow("", null).optional(),
   category: Joi.string().allow("", null).optional(),
-  price: Joi.number().min(0).required().messages({
-    "number.min": "Price must be a positive number",
-    "any.required": "Price is required",
-  }),
   quantity: Joi.number().integer().min(0).required().messages({
     "number.min": "Quantity must be a positive number",
     "number.integer": "Quantity must be a whole number",
     "any.required": "Quantity is required",
   }),
+  reorder_level: Joi.number().integer().min(0).optional(),
+  expiry: Joi.date().allow(null).optional(),
   sku: Joi.string().min(1).max(100).required().messages({
     "string.empty": "SKU cannot be empty",
     "string.max": "SKU must not exceed 100 characters",
@@ -69,12 +67,17 @@ const addProductSchema = Joi.object({
 
 const updateProductSchema = Joi.object({
   name: Joi.string().min(1).max(255).optional(),
-  description: Joi.string().allow("", null).optional(),
+  brand: Joi.string().allow("", null).optional(),
   category: Joi.string().allow("", null).optional(),
-  price: Joi.number().min(0).optional(),
   quantity: Joi.number().integer().min(0).optional(),
+  reorder_level: Joi.number().integer().min(0).optional(),
+  expiry: Joi.alternatives()
+    .try(Joi.date().iso(), Joi.string().allow("", null))
+    .optional(),
   sku: Joi.string().min(1).max(100).optional(),
   barcode: Joi.string().allow("", null).optional(),
+  action: Joi.string().valid("update", "sale", "restock", "return").optional(),
+  amount: Joi.number().integer().min(0).optional(),
 })
   .min(1)
   .messages({

@@ -101,7 +101,7 @@ function ProductsPage({ userRole }) {
         ) {
           toast.warning(
             ` Low Stock Alert: ${updatedProduct.name} (${updatedProduct.sku}) is at ${updatedProduct.quantity} units (Reorder level: ${updatedProduct.reorder_level})`,
-            { autoClose: 5000 }
+            { autoClose: 5000 },
           );
         }
       }
@@ -436,6 +436,7 @@ function EditProductModal({ product, onClose, onUpdate }) {
     category: product.category || "",
     quantity: product.quantity || 0,
     reorder_level: product.reorder_level || 0,
+    expiry: product.expiry ? product.expiry.split("T")[0] : "",
   });
 
   const handleChange = (e) => {
@@ -455,7 +456,12 @@ function EditProductModal({ product, onClose, onUpdate }) {
       alert("Product name is required");
       return;
     }
-    onUpdate(formData);
+    // Convert empty expiry string to null
+    const dataToSend = {
+      ...formData,
+      expiry: formData.expiry || null,
+    };
+    onUpdate(dataToSend);
   };
 
   return (
@@ -519,6 +525,16 @@ function EditProductModal({ product, onClose, onUpdate }) {
               value={formData.reorder_level}
               onChange={handleChange}
               placeholder="Enter reorder level"
+            />
+          </div>
+          <div className="modal-form-group">
+            <label>Expiry Date</label>
+            <input
+              type="date"
+              name="expiry"
+              value={formData.expiry}
+              onChange={handleChange}
+              placeholder="Select expiry date"
             />
           </div>
           <div className="modal-buttons">
